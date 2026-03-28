@@ -1,4 +1,4 @@
-if(${TARGET_CPU} MATCHES "x86_64" OR ${TARGET_CPU} MATCHES "aarch64")
+if(${TARGET_CPU} MATCHES "x86_64")
     set(rev "R65")
 else()
     set(rev "R63")
@@ -36,15 +36,6 @@ ExternalProject_Add_Step(vapoursynth generate-def
     LOG 1
 )
 
-if(COMPILER_TOOLCHAIN STREQUAL "gcc")
-ExternalProject_Add_Step(vapoursynth generate-lib
-    DEPENDEES generate-def
-    WORKING_DIRECTORY <SOURCE_DIR>
-    COMMAND ${EXEC} ${TARGET_ARCH}-dlltool -d VSScript.def -y libvsscript.a ${dlltool_opts}
-    COMMAND ${EXEC} ${TARGET_ARCH}-dlltool -d VapourSynth.def -y libvapoursynth.a ${dlltool_opts}
-    LOG 1
-)
-elseif(COMPILER_TOOLCHAIN STREQUAL "clang")
 ExternalProject_Add_Step(vapoursynth generate-lib
     DEPENDEES generate-def
     WORKING_DIRECTORY <SOURCE_DIR>
@@ -52,7 +43,6 @@ ExternalProject_Add_Step(vapoursynth generate-lib
     COMMAND ${EXEC} ${TARGET_ARCH}-dlltool -m ${dlltool_image} -d VapourSynth.def -l VapourSynth.lib
     LOG 1
 )
-endif()
 
 ExternalProject_Add_Step(vapoursynth download-header
     DEPENDEES generate-lib

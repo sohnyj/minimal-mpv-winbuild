@@ -15,28 +15,20 @@ execute_process(COMMAND ${PREFIX_DIR}/src/get_latest_tag.sh
 
 ExternalProject_Add(mpv-release
     DEPENDS
-        angle-headers
         ffmpeg
         fribidi
         lcms2
         libarchive
         libass
-        libdvdnav
-        libdvdread
         libiconv
         libjpeg
         libpng
         luajit
-        rubberband
         uchardet
-        openal-soft
-        mujs
         vulkan
         shaderc
         libplacebo
         spirv-cross
-        vapoursynth
-        libsdl2
         subrandr
     URL ${LINK}
     SOURCE_DIR ${SOURCE_LOCATION}
@@ -46,28 +38,21 @@ ExternalProject_Add(mpv-release
         --cross-file=${MESON_CROSS}
         --default-library=shared
         --prefer-static
-        -Ddebug=true
-        -Db_ndebug=true
         -Doptimization=3
         -Db_lto=true
         ${mpv_lto_mode}
-        -Dlibmpv=true
-        -Dpdf-build=enabled
+        -Dpdf-build=disabled
         -Dlua=enabled
-        -Djavascript=enabled
-        -Dsdl2-gamepad=enabled
+        -Djavascript=disabled
+        -Dsdl2-gamepad=disabled
         -Dlibarchive=enabled
         -Dlibbluray=enabled
-        -Ddvdnav=enabled
         -Duchardet=enabled
-        -Drubberband=enabled
+        -Drubberband=disabled
         -Dlcms2=enabled
-        -Dopenal=enabled
         -Dspirv-cross=enabled
         -Dvulkan=enabled
-        -Dvapoursynth=enabled
         -Dsubrandr=enabled
-        ${mpv_gl}
         -Dc_args='-Wno-error=int-conversion'
     BUILD_COMMAND ${EXEC} LTO_JOB=1 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ""
@@ -84,7 +69,6 @@ ExternalProject_Add_Step(mpv-release copy-versionfile
 
 ExternalProject_Add_Step(mpv-release strip-binary
     DEPENDEES build
-    ${mpv_add_debuglink}
     COMMENT "Stripping mpv binaries"
 )
 
@@ -92,9 +76,8 @@ ExternalProject_Add_Step(mpv-release copy-binary
     DEPENDEES strip-binary
     COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.exe                           ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/mpv.exe
     COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.com                           ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/mpv.com
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.pdf                           ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/doc/manual.pdf
     COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/etc/fonts/fonts.conf   ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/mpv/fonts.conf
-    COMMENT "Copying mpv binaries and manual"
+    COMMENT "Copying mpv binaries"
 )
 
 set(RENAME ${CMAKE_CURRENT_BINARY_DIR}/mpv-prefix/src/rename-stable.sh)

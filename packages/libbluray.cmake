@@ -1,6 +1,5 @@
 ExternalProject_Add(libbluray
     DEPENDS
-        libudfread
         freetype2
         libxml2
     GIT_REPOSITORY https://code.videolan.org/videolan/libbluray.git

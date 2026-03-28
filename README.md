@@ -1,91 +1,75 @@
 # CMake-based MinGW-w64 Cross Toolchain
 
-This thing’s primary use is to build Windows binaries of mpv.
+This fork is tailored for typical playback scenarios, removing video/audio encoding libraries, legacy formats, specialized formats, and rare protocol support.
+Encoding libraries (x264, x265, aom, lame, opus, flac, etc.) are only needed for encoding/transcoding — **FFmpeg's decoding and playback functionality remains fully intact.**
+Image encoding is limited to jpg, webp, and png via libjpeg, libwebp, and libpng.
+Only Vulkan and D3D are supported for rendering, with nvdec and soxr as exceptions.
 
-Alternatively, you can download the builds from [here](https://sourceforge.net/projects/mpv-player-windows/files/).
+## App Updater
+
+For easy updates: [sohnyj/app-updater](https://github.com/sohnyj/app-updater)
+
+## What's removed
+
+- **Video** — x264, x265, aom, svtav1, uavs3d, davs2, libvpx, xvidcore, avisynth-headers, vapoursynth
+- **Audio** — lame, opus (with libopusenc, opusfile, opus-tools, opus-dnn), flac, vorbis, ogg, speex, libopenmpt, libmodplug, game-music-emu, libmysofa, libbs2b, openal-soft, rubberband (with libsamplerate)
+- **Image** — libjxl (and highway)
+- **Subtitle** — libaribcaption, libzvbi
+- **Disc playback** — libdvdcss, libdvdread, libdvdnav, libudfread
+- **Network** — curl, libssh, libsrt, megasdk (with cryptopp, libuv, sqlite, readline, termcap)
+- **Graphics** — ANGLE headers
+- **Hardware acceleration** — amf-headers, libmfx, libva, libvpl
+- **TLS/Crypto** — gmp, nettle, mbedtls, libressl
+- **Scripting** — mujs
+- **Input** — libsdl2
+- **Compression** — xz (LZMA), lzo
+- **Misc** — libsixel
+
+GCC toolchain support is also removed; only Clang/LLD is supported.
+
+## Minimum Requirements
+
+- **OS**: Windows 10 or later
+- **CPU**: x86_64-v3 (AVX2 support required, e.g. Intel Haswell / AMD Excavator or newer)
 
 ## Prerequisites
 
- -  You should also install Ninja and use CMake’s Ninja build file generator.
-    It’s not only much faster than GNU Make, but also far less error-prone,
-    which is important for this project because CMake’s ExternalProject module
-    tends to generate makefiles which confuse GNU Make’s jobserver thingy.
+ -  You should also install Ninja and use CMake's Ninja build file generator.
+    It's not only much faster than GNU Make, but also far less error-prone,
+    which is important for this project because CMake's ExternalProject module
+    tends to generate makefiles which confuse GNU Make's jobserver thingy.
 
  -  As a build environment, any modern Linux distribution *should* work.
 
--   Compiling on Cygwin / MSYS2 is supported, but it tends to be slower
-    than compiling on Linux.
-
 ## Setup Build Environment
-### Manjaro / Arch Linux
-
-These packages need to be installed first before compiling mpv:
-
-    pacman -S git gyp mercurial subversion ninja cmake meson ragel yasm nasm asciidoc enca gperf unzip p7zip gcc-multilib clang lld libc++ libc++abi python-pip curl lib32-gcc-libs lib32-glib2 mimalloc ccache
-    
-    pip3 install rst2pdf mako jsonschema
-
-    pacman -S llvm # needed for building LLVM PGO
-
 ### Ubuntu Linux / WSL (Windows 10)
 
-    apt-get install build-essential checkinstall bison flex gettext git mercurial subversion ninja-build gyp cmake yasm nasm automake pkgconf libtool libtool-bin gcc-multilib g++-multilib clang lld libc++1 libc++abi1 libgmp-dev libmpfr-dev libmpc-dev libgcrypt-dev gperf ragel texinfo autopoint re2c asciidoc python3-pip docbook2x unzip p7zip-full curl mimalloc ccache
+    apt-get install build-essential git ninja-build cmake automake pkgconf libtool libtool-bin clang llvm lld libc++1 libc++abi1 libgmp-dev libmpfr-dev libmpc-dev libgcrypt-dev python3-pip unzip p7zip-full curl ccache gettext nasm
 
-    pip3 install rst2pdf meson mako jsonschema
+    pip3 install --break-system-packages meson mako jsonschema
 
-**Note:**
-
-* Use [apt-fast](https://github.com/ilikenwf/apt-fast) if apt-get is too slow.
-* It is advised to use bash over dash. Set `sudo ln -sf /bin/bash /bin/sh`. Revert back by `sudo ln -sf /bin/dash /bin/sh`.
-* On WSL platform, compiling 32bit requires qemu. Refer to [this](https://github.com/Microsoft/WSL/issues/2468#issuecomment-374904520).
-* To update package installed by pip, run `pip3 install <package> --upgrade`.
-
-### Cygwin
-
-Download Cygwin installer and run:
-
-    setup-x86_64.exe -R "C:\cygwin64" -q --packages="bash,binutils,bzip2,cygwin,gcc-core,gcc-g++,cygwin32-gcc-core,cygwin32-gcc-g++,gzip,m4,pkgconf,make,unzip,zip,diffutils,wget,git,patch,cmake,gperf,yasm,enca,asciidoc,bison,flex,gettext-devel,mercurial,python-devel,python-docutils,docbook2X,texinfo,libmpfr-devel,libgmp-devel,libmpc-devel,libtool,autoconf2.5,automake,automake1.9,libxml2-devel,libxslt-devel,meson,libunistring5"
-
-Additionally, some packages, `re2c`, `ninja`, `ragel`, `gyp`, `rst2pdf`, `nasm` need to be [installed manually](https://gist.github.com/shinchiro/705b0afcc7b6c0accffba1bedb067abf).
-
-### MSYS2
-
-Install MSYS2 and run it via `MSYS2 MSYS` shortcut.
-Don't use `MSYS2 MinGW 32-bit` or `MSYS2 MinGW 64-bit` shortcuts, that's important!
-
-These packages need to be installed first before compiling mpv:
-
-    pacman -S base-devel cmake gcc yasm nasm git mercurial subversion gyp tar gmp-devel mpc-devel mpfr-devel python zlib-devel unzip zip p7zip meson libunistring5
-
-Don't install anything from the `mingw32` and `mingw64` repositories,
-it's better to completely disable them in `/etc/pacman.conf` just to be safe.
-
-Additionally, some packages, `re2c`, `ninja`, `ragel`, `libjpeg`, `rst2pdf`, `jinja2` need to be [installed manually](https://gist.github.com/shinchiro/705b0afcc7b6c0accffba1bedb067abf).
-
-
-## Compiling with GCC
+## Compiling with Clang
 
 Example:
 
     cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
-    -DGCC_ARCH=x86-64-v3 \
-    -DSINGLE_SOURCE_LOCATION="/home/user/packages" \
-    -DRUSTUP_LOCATION="/home/user/install_rustup" \
-    -G Ninja -B build64 -S mpv-winbuild-cmake
+    -DCMAKE_INSTALL_PREFIX="/home/USER/clang_root" \
+    -DCOMPILER_TOOLCHAIN=clang \
+    -DLLVM_ARCH=x86-64-v3 \
+    -DSINGLE_SOURCE_LOCATION="/home/USER/packages" \
+    -DRUSTUP_LOCATION="/home/USER/install_rustup" \
+    -DMINGW_INSTALL_PREFIX="/home/USER/build_x86_64-v3/x86_64-v3-w64-mingw32" \
+    -G Ninja -B build_x86_64-v3 -S mpv-winbuild-cmake
 
-This cmake command will create `build64` folder for `x86_64-w64-mingw32`. Set `-DTARGET_ARCH=i686-w64-mingw32` for compiling 32-bit.
+The cmake command will create `clang_root` as clang sysroot where llvm tools installed. `build_x86_64-v3` is build directory to compiling packages.
 
-`-DGCC_ARCH=x86-64-v3` will set `-march` option when compiling gcc with `x86-64-v3` instructions. Other value like `native`, `znver3` should work too.
+    cd build_x86_64-v3
+    ninja llvm       # build LLVM (take around ~2 hours)
+    ninja rustup     # build rust toolchain
+    ninja llvm-clang # build clang on specified target
+    ninja mpv        # build mpv and all its dependencies
 
-Enter `build64` folder and build toolchain once. By default, it will be installed in `install` folder.
-
-    ninja download # download all packages at once (optional)
-    ninja gcc      # build gcc only once (take around ~20 minutes)
-    ninja mpv      # build mpv and all its dependencies
-
-On **WSL2**, you might see it stuck with 100% disk usage and never finished. See [below](#wsl-workaround).
-
-The final `build64` folder's size will be around ~3GB.
+`-DLLVM_ARCH=x86-64-v3` will set `-march` option when compiling with `x86-64-v3` instructions. Other value like `native`, `znver3` should work too.
 
 ## Building Software (Second Time)
 
@@ -96,47 +80,6 @@ To build mpv for a second time:
 After that, build mpv as usual:
 
     ninja mpv
-
-## Compiling with Clang
-
-Supported target architecture (`TARGET_ARCH`) with clang is: `x86_64-w64-mingw32` , `i686-w64-mingw32` , `aarch64-w64-mingw32`. The `aarch64` are untested.
-
-Example:
-
-    cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
-    -DCMAKE_INSTALL_PREFIX="/home/user/clang_root" \
-    -DCOMPILER_TOOLCHAIN=clang \
-    -DGCC_ARCH=x86-64-v3 \
-    -DSINGLE_SOURCE_LOCATION="/home/user/packages" \
-    -DRUSTUP_LOCATION="/home/user/install_rustup" \
-    -DMINGW_INSTALL_PREFIX="/home/user/build_x86_64_v3/x86_64_v3-w64-mingw32" \
-    -G Ninja -B build_x86_64_v3 -S mpv-winbuild-cmake
-
-The cmake command will create `clang_root` as clang sysroot where llvm tools installed. `build_x86_64` is build directory to compiling packages.
-
-    cd build_x86_64
-    ninja llvm       # build LLVM (take around ~2 hours)
-    ninja rustup     # build rust toolchain
-    ninja llvm-clang # build clang on specified target
-    ninja mpv        # build mpv and all its dependencies
-
-If you want add another target (ex. `i686-w64-mingw32`), change `TARGET_ARCH` and build folder.
-
-    cmake -DTARGET_ARCH=i686-w64-mingw32 \
-    -DCMAKE_INSTALL_PREFIX="/home/user/clang_root" \
-    -DCOMPILER_TOOLCHAIN=clang \
-    -DSINGLE_SOURCE_LOCATION="/home/user/packages" \
-    -DRUSTUP_LOCATION="/home/user/install_rustup" \
-    -DMINGW_INSTALL_PREFIX="/home/user/build_i686/i686-w64-mingw32" \
-    -G Ninja -B build_i686 -S mpv-winbuild-cmake
-    cd build_i686
-    ninja llvm-clang # same as above
-
-If you've changed `GCC_ARCH` option, you need to run:
-
-    ninja rebuild_cache
-
-to update flags which will pass on gcc, g++ and etc.
 
 ## Available Commands
 
@@ -157,113 +100,43 @@ to update flags which will pass on gcc, g++ and etc.
 ## Information about packages
 
 - Git/Hg
-    - ANGLE
+    - brotli
+    - bzip2
+    - dav1d
+    - expat
     - FFmpeg
-    - xz
-    - x264
-    - x265 (multilib)
-    - uchardet
-    - rubberband (with libsamplerate)
-    - opus
-    - openal-soft
-    - mpv
-    - luajit
-    - libvpx
-    - libwebp
+    - fontconfig
+    - freetype2
+    - fribidi
+    - harfbuzz
+    - lcms2
+    - libarchive
+    - libass
+    - libbluray
+    - libjpeg
+    - libplacebo (with glad, fast_float, xxhash)
     - libpng
     - libsoxr
-    - libzimg (with graphengine)
-    - libdvdread
-    - libdvdnav
-    - libdvdcss
-    - libudfread
-    - libbluray
     - libunibreak
-    - libass
-    - libmysofa
-    - lcms2
-    - lame
-    - harfbuzz
-    - game-music-emu
-    - freetype2
-    - flac
-    - opus-tools
-    - mujs
-    - libarchive
-    - libjpeg
-    - shaderc (with spirv-headers, spirv-tools, glslang)
-    - vulkan-header
-    - vulkan
-    - spirv-cross
-    - fribidi
-    - ~~nettle~~
-    - curl
+    - libwebp
     - libxml2
-    - amf-headers
-    - avisynth-headers
+    - libzimg (with graphengine)
+    - luajit
+    - mpv
     - nvcodec-headers
-    - libvpl
-    - megasdk (with termcap, readline, cryptopp, sqlite, libuv, libsodium)
-    - aom
-    - dav1d
-    - libplacebo (with glad, fast_float, xxhash)
-    - fontconfig
-    - libbs2b
-    - libssh
-    - libsrt
-    - libjxl (with brotli, highway)
-    - libmodplug
-    - uavs3d
-    - davs2
-    - libsixel
-    - libva
-    - libzvbi
-    - svtav1
-    - libaribcaption
+    - openssl
+    - shaderc (with spirv-headers, spirv-tools, glslang)
+    - spirv-cross
+    - subrandr
+    - uchardet
+    - vulkan
+    - vulkan-header
     - zlib (zlib-ng)
     - zstd
-    - expat
-    - openssl
-    - libsdl2
-    - speex
-    - vorbis
-    - ogg
-    - bzip2
 
 - Zip
-    - xvidcore (1.3.7)
-    - lzo (2.10)
-    - libopenmpt (0.7.12)
-    - libiconv (1.18)
-    - ~~gmp (6.3.0)~~
-    - vapoursynth (R65/R63)
-    - ~~mbedtls (3.5.0)~~
-    - ~~libressl (3.1.5)~~
-
-
-### WSL workaround
-
-Place the file on specified location to limit ram & cpu usage to avoid getting stuck while building mpv.
-
-    # /etc/wsl.conf
-    [interop]
-    #enabled=false
-    appendWindowsPath=false
-
-    [automount]
-    enabled = true
-    options = "metadata"
-    mountFsTab = false
-
-    [user]
-    default=<user>
-    ---------------------------------------
-    # C:\Users\<UserName>\.wslconfig
-    [wsl2]
-    memory=4GB
-    swap=0
-    pageReporting=false
+    - libiconv (1.19)
 
 ## Acknowledgements
 
-This project was originally created and maintained [lachs0r](https://github.com/lachs0r/mingw-w64-cmake). Since then, it heavily modified to suit my own need.
+This project was originally created by [lachs0r](https://github.com/lachs0r/mingw-w64-cmake) and heavily modified by [shinchiro](https://github.com/shinchiro/mpv-winbuild-cmake). This fork is a minimal build trimmed down for personal use.

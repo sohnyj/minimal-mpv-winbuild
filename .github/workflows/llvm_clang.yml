@@ -10,6 +10,11 @@ on:
         description: 'Run custom command before building'
         required: false
         type: string
+      fresh_build:
+        description: 'Ignore cache and rebuild from scratch'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build_llvm:
@@ -17,9 +22,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-    container:
-        image: docker://ghcr.io/shinchiro/archlinux:latest
     steps:
+      - name: Installing dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git ninja-build cmake automake pkgconf libtool libtool-bin clang llvm lld libc++1 libc++abi1 libgmp-dev libmpfr-dev libmpc-dev libgcrypt-dev python3-pip unzip p7zip-full curl ccache gettext nasm
+          pip3 install --break-system-packages meson mako jsonschema
+
       - name: Setup git config
         run: |
           git config --global user.name "github-actions"
@@ -35,6 +44,7 @@ jobs:
 
       - name: Loading clang root
         id: clang_root_cache
+        if: ${{ github.event.inputs.fresh_build != 'true' }}
         uses: actions/cache/restore@main
         with:
           path: clang_root
@@ -43,35 +53,30 @@ jobs:
 
       - name: Loading x86_64 toolchain
         id: x86_64_cache
+        if: ${{ github.event.inputs.fresh_build != 'true' }}
         uses: actions/cache/restore@main
         with:
           path: build_x86_64
           key: ${{ secrets.CACHE_VERSION }}-clang-x86_64_toolchain-${{ github.run_id }}
           restore-keys: ${{ secrets.CACHE_VERSION }}-clang-x86_64_toolchain
 
-      - name: Loading x86_64_v3 toolchain
-        id: x86_64_v3_cache
+      - name: Loading x86_64-v3 toolchain
+        id: v3_cache
+        if: ${{ github.event.inputs.fresh_build != 'true' }}
         uses: actions/cache/restore@main
         with:
-          path: build_x86_64_v3
-          key: ${{ secrets.CACHE_VERSION }}-clang-x86_64_v3_toolchain-${{ github.run_id }}
-          restore-keys: ${{ secrets.CACHE_VERSION }}-clang-x86_64_v3_toolchain
+          path: build_x86_64-v3
+          key: ${{ secrets.CACHE_VERSION }}-clang-v3_toolchain-${{ github.run_id }}
+          restore-keys: ${{ secrets.CACHE_VERSION }}-clang-v3_toolchain
 
-      - name: Loading i686 toolchain
-        id: i686_cache
+      - name: Loading x86_64-znver3 toolchain
+        id: znver3_cache
+        if: ${{ github.event.inputs.fresh_build != 'true' }}
         uses: actions/cache/restore@main
         with:
-          path: build_i686
-          key: ${{ secrets.CACHE_VERSION }}-clang-i686_toolchain-${{ github.run_id }}
-          restore-keys: ${{ secrets.CACHE_VERSION }}-clang-i686_toolchain
-
-      - name: Loading aarch64 toolchain
-        id: aarch64_cache
-        uses: actions/cache/restore@main
-        with:
-          path: build_aarch64
-          key: ${{ secrets.CACHE_VERSION }}-clang-aarch64_toolchain-${{ github.run_id }}
-          restore-keys: ${{ secrets.CACHE_VERSION }}-clang-aarch64_toolchain
+          path: build_x86_64-znver3
+          key: ${{ secrets.CACHE_VERSION }}-clang-znver3_toolchain-${{ github.run_id }}
+          restore-keys: ${{ secrets.CACHE_VERSION }}-clang-znver3_toolchain
 
       - name: Loading repository cache
         id: repository_cache
@@ -102,22 +107,16 @@ jobs:
           ninja -C build_x86_64 llvm-clang
 
       - name: Building x86_64-v3 toolchain
-        if: ${{ steps.x86_64_v3_cache.outputs.cache-matched-key == '' }}
+        if: ${{ steps.v3_cache.outputs.cache-matched-key == '' }}
         run: |
-          cmake -DTARGET_ARCH=x86_64-w64-mingw32 -DLLVM_ENABLE_PGO=GEN -DCOMPILER_TOOLCHAIN=clang -DGCC_ARCH=x86-64-v3 -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/build_x86_64_v3/x86_64_v3-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -G Ninja -B build_x86_64_v3 -S $PWD
-          ninja -C build_x86_64_v3 llvm-clang
+          cmake -DTARGET_ARCH=x86_64-w64-mingw32 -DCOMPILER_TOOLCHAIN=clang -DLLVM_ARCH=x86-64-v3 -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/build_x86_64-v3/x86_64-v3-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -G Ninja -B build_x86_64-v3 -S $PWD
+          ninja -C build_x86_64-v3 llvm-clang
 
-      - name: Building i686 toolchain
-        if: ${{ steps.i686_cache.outputs.cache-matched-key == '' }}
+      - name: Building x86_64-znver3 toolchain
+        if: ${{ steps.znver3_cache.outputs.cache-matched-key == '' }}
         run: |
-          cmake -DTARGET_ARCH=i686-w64-mingw32 -DLLVM_ENABLE_PGO=GEN -DCOMPILER_TOOLCHAIN=clang -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/build_i686/i686-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -G Ninja -B build_i686 -S $PWD
-          ninja -C build_i686 llvm-clang
-
-      - name: Building aarch64 toolchain
-        if: ${{ steps.aarch64_cache.outputs.cache-matched-key == '' }}
-        run: |
-          cmake -DTARGET_ARCH=aarch64-w64-mingw32 -DLLVM_ENABLE_PGO=GEN -DCOMPILER_TOOLCHAIN=clang -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/build_aarch64/aarch64-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -G Ninja -B build_aarch64 -S $PWD
-          ninja -C build_aarch64 llvm-clang
+          cmake -DTARGET_ARCH=x86_64-w64-mingw32 -DCOMPILER_TOOLCHAIN=clang -DLLVM_ARCH=znver3 -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/build_x86_64-znver3/x86_64-znver3-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -G Ninja -B build_x86_64-znver3 -S $PWD
+          ninja -C build_x86_64-znver3 llvm-clang
 
       - name: PGO training with shaderc
         if: ${{ steps.clang_root_cache.outputs.cache-matched-key == '' }}
@@ -139,15 +138,15 @@ jobs:
 
       - name: Cleanup
         run: |
-          rm -rf {build_i686,build_x86_64,build_x86_64_v3,build_aarch64}/{toolchain,packages} || true
+          rm -rf {build_x86_64,build_x86_64-v3,build_x86_64-znver3}/{toolchain,packages} || true
 
       - name: Collecting logs
         if: always()
         run: |
-          mkdir -p build_x86_64_logs build_i686_logs build_aarch64_logs
+          mkdir -p build_x86_64_logs build_x86_64-v3_logs build_x86_64-znver3_logs
           cp -fr $(find build_x86_64 -type f -iname "*-*.log") build_x86_64_logs || true
-          cp -fr $(find build_i686 -type f -iname "*-*.log") build_i686_logs || true
-          cp -fr $(find build_aarch64 -type f -iname "*-*.log") build_aarch64_logs || true
+          cp -fr $(find build_x86_64-v3 -type f -iname "*-*.log") build_x86_64-v3_logs || true
+          cp -fr $(find build_x86_64-znver3 -type f -iname "*-*.log") build_x86_64-znver3_logs || true
           7z a -m0=lzma2 -mx=9 -ms=on logs.7z build*logs
 
       - name: Uploading logs
@@ -177,23 +176,17 @@ jobs:
           path: build_x86_64
           key: ${{ secrets.CACHE_VERSION }}-clang-x86_64_toolchain-${{ github.run_id }}
 
-      - name: Saving x86_64_v3 toolchain
+      - name: Saving x86_64-v3 toolchain
         uses: actions/cache/save@main
         with:
-          path: build_x86_64_v3
-          key: ${{ secrets.CACHE_VERSION }}-clang-x86_64_v3_toolchain-${{ github.run_id }}
+          path: build_x86_64-v3
+          key: ${{ secrets.CACHE_VERSION }}-clang-v3_toolchain-${{ github.run_id }}
 
-      - name: Saving i686 toolchain
+      - name: Saving x86_64-znver3 toolchain
         uses: actions/cache/save@main
         with:
-          path: build_i686
-          key: ${{ secrets.CACHE_VERSION }}-clang-i686_toolchain-${{ github.run_id }}
-
-      - name: Saving aarch64 toolchain
-        uses: actions/cache/save@main
-        with:
-          path: build_aarch64
-          key: ${{ secrets.CACHE_VERSION }}-clang-aarch64_toolchain-${{ github.run_id }}
+          path: build_x86_64-znver3
+          key: ${{ secrets.CACHE_VERSION }}-clang-znver3_toolchain-${{ github.run_id }}
 
       - name: Saving repository cache
         if: false
@@ -211,13 +204,11 @@ jobs:
     steps:
       - name: Run mpv_clang.yml
         run: |
-          curl -u shinchiro:$GH_TOKEN -X POST -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/shinchiro/mpv-winbuild-cmake/actions/workflows/mpv_clang.yml/dispatches -d @- <<EOF
+          curl -u sohnyj:$GH_TOKEN -X POST -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/sohnyj/minimal-mpv-winbuild/actions/workflows/mpv_clang.yml/dispatches -d @- <<EOF
           {
             "ref": "master",
             "inputs": {
-              "sourceforge": "false",
-              "github_release": "false",
-              "mpv_tarball": "false"
+              "github_release": "true"
             }
           }
           EOF

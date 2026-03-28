@@ -15,8 +15,7 @@ ExternalProject_Add(zlib
         -DINSTALL_PKGCONFIG_DIR=${MINGW_INSTALL_PREFIX}/lib/pkgconfig
         -DSKIP_INSTALL_LIBRARIES=OFF
         -DZLIB_COMPAT=ON
-        -DZLIB_ENABLE_TESTS=OFF
-        -DZLIBNG_ENABLE_TESTS=OFF
+        -DBUILD_TESTING=OFF
         -DFNO_LTO_AVAILABLE=OFF
     BUILD_COMMAND ${EXEC} ${zlib_nlto} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install

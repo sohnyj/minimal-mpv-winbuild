@@ -6,12 +6,7 @@ else()
     set(LUAJIT_HOST_GCC gcc)
 endif()
 
-if(${TARGET_CPU} MATCHES "i686")
-    set(LUAJIT_GCC_ARGS "-m32")
-    set(DISABLE_JIT "-DLUAJIT_DISABLE_JIT")
-else()
-    set(LUAJIT_GCC_ARGS "-m64")
-endif()
+set(LUAJIT_GCC_ARGS "-m64")
 
 set(EXPORT
     "CROSS=${TARGET_ARCH}-

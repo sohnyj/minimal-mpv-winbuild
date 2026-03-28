@@ -24,7 +24,6 @@ ExternalProject_Add(llvm-compiler-rt
         -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY
         -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY
         -DSANITIZER_CXX_ABI=libc++
-        -DCMAKE_CXX_FLAGS='-std=c++11'
         -DCMAKE_EXE_LINKER_FLAGS_INIT='-lc++abi'
     BUILD_COMMAND ${EXEC} LTO=0 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} LTO=0 ninja -C <BINARY_DIR> install
