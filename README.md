@@ -5,8 +5,6 @@ Encoding libraries (x264, x265, aom, lame, opus, flac, etc.) are only needed for
 Image encoding is limited to jpg, webp, and png via libjpeg, libwebp, and libpng.
 Only Vulkan and D3D are supported for rendering, with nvdec and soxr as exceptions.
 
-## App Updater
-
 For easy updates: [sohnyj/app-updater](https://github.com/sohnyj/app-updater)
 
 ## What's removed
