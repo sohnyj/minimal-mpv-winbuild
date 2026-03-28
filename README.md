@@ -54,7 +54,6 @@ Example:
 
     cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
     -DCMAKE_INSTALL_PREFIX="/home/USER/clang_root" \
-    -DCOMPILER_TOOLCHAIN=clang \
     -DLLVM_ARCH=x86-64-v3 \
     -DSINGLE_SOURCE_LOCATION="/home/USER/packages" \
     -DRUSTUP_LOCATION="/home/USER/install_rustup" \
