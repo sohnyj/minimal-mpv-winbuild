@@ -5,6 +5,8 @@ Encoding libraries (x264, x265, aom, lame, opus, flac, etc.) are only needed for
 Image encoding is limited to jpg, webp, and png via libjpeg, libwebp, and libpng.
 Only Vulkan and D3D are supported for rendering, with nvdec and soxr as exceptions.
 
+Autobuild runs daily at UTC 00:00.
+
 For easy updates: [sohnyj/app-updater](https://github.com/sohnyj/app-updater)
 
 ## What's removed
@@ -31,7 +33,7 @@ GCC toolchain support is also removed; only Clang/LLD is supported.
 
 ## Prerequisites
 
- -  You should also install Ninja and use CMake's Ninja build file generator.
+ -  You should install Ninja and use CMake's Ninja build file generator.
     It's not only much faster than GNU Make, but also far less error-prone,
     which is important for this project because CMake's ExternalProject module
     tends to generate makefiles which confuse GNU Make's jobserver thingy.
@@ -55,17 +57,17 @@ Example:
     -DSINGLE_SOURCE_LOCATION="/home/USER/packages" \
     -DRUSTUP_LOCATION="/home/USER/install_rustup" \
     -DMINGW_INSTALL_PREFIX="/home/USER/build_x86_64-v3/x86_64-v3-w64-mingw32" \
-    -G Ninja -B build_x86_64-v3 -S mpv-winbuild-cmake
+    -G Ninja -B build_x86_64-v3 -S minimal-mpv-winbuild
 
-The cmake command will create `clang_root` as clang sysroot where llvm tools installed. `build_x86_64-v3` is build directory to compiling packages.
+The cmake command will create `clang_root` as clang sysroot where LLVM tools are installed. `build_x86_64-v3` is the build directory for compiling packages.
 
     cd build_x86_64-v3
-    ninja llvm       # build LLVM (take around ~2 hours)
+    ninja llvm       # build LLVM (takes ~2 hours)
     ninja rustup     # build rust toolchain
     ninja llvm-clang # build clang on specified target
     ninja mpv        # build mpv and all its dependencies
 
-`-DLLVM_ARCH=x86-64-v3` will set `-march` option when compiling with `x86-64-v3` instructions. Other value like `native`, `znver3` should work too.
+`-DLLVM_ARCH=x86-64-v3` will set the `-march` option to `x86-64-v3` instructions. Other values like `native`, `znver3` should work too.
 
 ## Building Software (Second Time)
 
@@ -84,9 +86,9 @@ After that, build mpv as usual:
 | ninja package              | compile a package |
 | ninja clean                | remove all stamp files in all packages. |
 | ninja download             | Download all packages' sources at once without compiling. |
-| ninja update               | Update all git repos. When a package pulls new changes, all of its stamp files will be deleted and will be forced rebuild. If there is no change, it will not remove the stamp files and no rebuild occur. Use this instead of `ninja clean` if you don't want to rebuild everything in the next run. |
+| ninja update               | Update all git repos. When a package pulls new changes, all of its stamp files will be deleted and will be force-rebuilt. If there is no change, it will not remove the stamp files and no rebuild occurs. Use this instead of `ninja clean` if you don't want to rebuild everything in the next run. |
 | ninja package-fullclean    | Remove all stamp files of a package. |
-| ninja package-liteclean    | Remove build, clean stamp files only. This will skip re-configure in the next running `ninja package` (after the first compile). Updating repo or patching need to do manually. Ideally, all `DEPENDS` targets in `package.cmake` should be temporarily commented or deleted. Might be useful in some cases. |
+| ninja package-liteclean    | Remove build, clean stamp files only. This will skip re-configure in the next running `ninja package` (after the first compile). Updating repo or patching needs to be done manually. Ideally, all `DEPENDS` targets in `package.cmake` should be temporarily commented or deleted. Might be useful in some cases. |
 | ninja package-removebuild  | Remove 'build' directory of a package. |
 | ninja package-removeprefix | Remove 'prefix' directory. |
 | ninja package-force-update | Update a package. Only git repo will be updated. |
@@ -95,7 +97,7 @@ After that, build mpv as usual:
 
 ## Information about packages
 
-- Git/Hg
+- Git
     - brotli
     - bzip2
     - dav1d
