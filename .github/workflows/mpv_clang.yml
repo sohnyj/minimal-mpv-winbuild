@@ -128,6 +128,7 @@ jobs:
         if: always()
         run: |
           rm -rf $BUILD_DIR/mpv*
+          ninja -C $BUILD_DIR mpv-fullclean
 
       - name: Cleaning rust toolchain directory
         if: always()
