@@ -14,7 +14,7 @@ For easy updates: [sohnyj/app-updater](https://github.com/sohnyj/app-updater)
 - **Image** — libjxl (and highway)
 - **Subtitle** — libaribcaption, libzvbi
 - **Disc playback** — libdvdcss, libdvdread, libdvdnav, libudfread
-- **Network** — curl, libssh, libsrt, megasdk (with cryptopp, libuv, sqlite, readline, termcap)
+- **Network** — curl, libssh, libsrt, megasdk (with cryptopp, libsodium, libuv, sqlite, readline, termcap)
 - **Graphics** — ANGLE headers
 - **Hardware acceleration** — amf-headers, libmfx, libva, libvpl
 - **Scripting** — mujs
