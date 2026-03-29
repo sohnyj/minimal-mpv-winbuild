@@ -17,7 +17,6 @@ For easy updates: [sohnyj/app-updater](https://github.com/sohnyj/app-updater)
 - **Network** — curl, libssh, libsrt, megasdk (with cryptopp, libuv, sqlite, readline, termcap)
 - **Graphics** — ANGLE headers
 - **Hardware acceleration** — amf-headers, libmfx, libva, libvpl
-- **TLS/Crypto** — gmp, nettle, mbedtls, libressl
 - **Scripting** — mujs
 - **Input** — libsdl2
 - **Compression** — xz (LZMA), lzo
