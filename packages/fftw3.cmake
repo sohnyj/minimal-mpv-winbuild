@@ -10,6 +10,7 @@ ExternalProject_Add(fftw3
         --enable-static
         --enable-threads
         --enable-avx2
+        --enable-fma
         --with-our-malloc
     BUILD_COMMAND ${MAKE}
     INSTALL_COMMAND ${MAKE} install
