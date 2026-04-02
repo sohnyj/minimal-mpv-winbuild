@@ -40,9 +40,9 @@ list(APPEND ep
     glad
     fast_float
     libplacebo
-    fftw3
-    libsamplerate
-    rubberband
+    #fftw3
+    #libsamplerate
+    #rubberband
     ffmpeg
     mpv
     mpv-packaging
