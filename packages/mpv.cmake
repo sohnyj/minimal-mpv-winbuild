@@ -1,6 +1,7 @@
 ExternalProject_Add(mpv
     DEPENDS
         ffmpeg
+        rubberband
         fribidi
         lcms2
         libarchive
@@ -35,7 +36,7 @@ ExternalProject_Add(mpv
         -Dlibarchive=enabled
         -Dlibbluray=enabled
         -Duchardet=enabled
-        -Drubberband=disabled
+        -Drubberband=enabled
         -Dlcms2=enabled
         -Dspirv-cross=enabled
         -Dvulkan=enabled
