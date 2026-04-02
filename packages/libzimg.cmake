@@ -6,7 +6,6 @@ ExternalProject_Add(libzimg
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
     GIT_SUBMODULES ""
-    PATCH_COMMAND ${EXEC} sed -i "s/Windows.h/windows.h/g" src/zimg/common/arm/cpuinfo_arm.cpp
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
     COMMAND bash -c "rm -rf <SOURCE_DIR>/graphengine"
@@ -15,6 +14,10 @@ ExternalProject_Add(libzimg
         --host=${TARGET_ARCH}
         --prefix=${MINGW_INSTALL_PREFIX}
         --disable-shared
+        --disable-testapp
+        --disable-example
+        --disable-unit-test
+        --disable-debug
     BUILD_COMMAND ${MAKE}
     INSTALL_COMMAND ${MAKE} install
             COMMAND bash -c "git -C ${src_graphengine} clean -dfx"
