@@ -50,6 +50,7 @@ ExternalProject_Add(ffmpeg
         --disable-doc
         --disable-ffplay
         --disable-ffprobe
+        --disable-indev=dshow
         --disable-indev=gdigrab
         --disable-indev=vfwcap
         --disable-outdevs
