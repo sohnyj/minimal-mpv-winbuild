@@ -15,13 +15,19 @@ ExternalProject_Add(harfbuzz
         --cross-file=${MESON_CROSS}
         --buildtype=release
         --default-library=static
-        -Dicu=disabled
+        -Dbenchmark=disabled
+        -Dcairo=disabled
+        -Ddocs=disabled
         -Dglib=disabled
         -Dgobject=disabled
+        -Dgpu=disabled
+        -Dicu=disabled
+        -Dintrospection=disabled
+        -Draster=disabled
+        -Dsubset=disabled
         -Dtests=disabled
-        -Ddocs=disabled
-        -Dbenchmark=disabled
         -Dutilities=disabled
+        -Dvector=disabled
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1

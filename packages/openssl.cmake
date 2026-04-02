@@ -16,47 +16,56 @@ ExternalProject_Add(openssl
         --prefix=${MINGW_INSTALL_PREFIX}
         --libdir=lib
         --release
-        no-autoload-config
         ${openssl_target}
         ${openssl_ec_opt}
-        no-ssl3-method
-        enable-brotli
-        no-whirlpool
-        no-filenames
-        no-camellia
-        enable-zstd
-        no-capieng
-        no-shared
-        no-rmd160
-        no-module
-        no-legacy
-        no-tests
         threads
-        no-docs
+        zlib
+        enable-brotli
+        enable-zstd
         no-apps
-        no-ocsp
-        no-ssl3
-        no-cmac
-        no-mdc2
-        no-idea
-        no-cast
-        no-seed
         no-aria
-        no-err
-        no-dso
+        no-bf
+        no-camellia
+        no-capieng
+        no-cast
+        no-cmac
+        no-cmp
+        no-cms
+        no-comp
+        no-ct
+        no-demos
+        no-dh
+        no-docs
         no-dsa
-        no-srp
+        no-dso
+        no-ec2m
+        no-err
+        no-filenames
+        no-gost
+        no-idea
+        no-legacy
+        no-md2
+        no-md4
+        no-mdc2
+        no-module
+        no-ocsp
         no-rc2
         no-rc4
+        no-rc5
+        no-rmd160
+        no-seed
+        no-shared
+        no-siphash
         no-sm2
         no-sm3
         no-sm4
-        no-md4
-        no-cms
-        no-cmp
-        no-dh
-        no-bf
-        zlib
+        no-srp
+        no-ssl3
+        no-ssl3-method
+        no-tests
+        no-ts
+        no-whirlpool
+        no-autoload-config
     BUILD_COMMAND ${MAKE} build_sw
     INSTALL_COMMAND ${MAKE} install_sw
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1

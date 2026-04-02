@@ -14,6 +14,8 @@ ExternalProject_Add(zstd
         -Dlegacy_level=0
         -Ddebug_level=0
         -Dbin_programs=false
+        -Dbin_tests=false
+        -Dbin_contrib=false
         -Dzlib=disabled
         -Dlzma=disabled
         -Dlz4=disabled
