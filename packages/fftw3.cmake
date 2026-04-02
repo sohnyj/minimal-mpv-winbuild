@@ -8,7 +8,6 @@ ExternalProject_Add(fftw3
         --prefix=${MINGW_INSTALL_PREFIX}
         --disable-shared
         --enable-static
-        --enable-threads
         --enable-avx2
         --enable-fma
         --with-our-malloc
