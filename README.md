@@ -12,7 +12,7 @@ For easy updates: [sohnyj/app-updater](https://github.com/sohnyj/app-updater)
 ## What's removed
 
 - **Video** — x264, x265, aom, svtav1, uavs3d, davs2, libvpx, xvidcore, avisynth-headers, vapoursynth
-- **Audio** — lame, opus (with libopusenc, opusfile, opus-tools, opus-dnn), flac, vorbis, ogg, speex, libopenmpt, libmodplug, game-music-emu, libmysofa, libbs2b, openal-soft
+- **Audio** — lame, opus (with libopusenc, opusfile, opus-tools, opus-dnn), flac, vorbis, ogg, speex, libopenmpt, libmodplug, game-music-emu, libmysofa, libbs2b, openal-soft, rubberband (with fftw3, libsamplerate)
 - **Image** — libjxl (and highway)
 - **Subtitle** — libaribcaption, libzvbi
 - **Disc playback** — libdvdcss, libdvdread, libdvdnav, libudfread
@@ -121,9 +121,7 @@ After that, build mpv as usual:
     - libzimg (with graphengine)
     - luajit
     - mpv
-    - libsamplerate
     - nvcodec-headers
-    - rubberband
     - openssl
     - shaderc (with spirv-headers, spirv-tools, glslang)
     - spirv-cross
@@ -135,7 +133,6 @@ After that, build mpv as usual:
     - zstd
 
 - Tarball
-    - fftw3 (3.3.10)
     - libiconv (1.19)
 
 ## Acknowledgements
