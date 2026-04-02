@@ -29,18 +29,21 @@ ExternalProject_Add(mpv
         -Doptimization=3
         -Db_lto=true
         ${mpv_lto_mode}
-        -Dpdf-build=disabled
-        -Dlua=enabled
+        -Dcplugins=disabled
+        -Dd3d9-hwaccel=disabled
+        -Ddirect3d=disabled
+        -Dgl=disabled
         -Djavascript=disabled
-        -Dsdl2-gamepad=disabled
+        -Dlibmpv=false
+        -Dlcms2=enabled
         -Dlibarchive=enabled
         -Dlibbluray=enabled
-        -Duchardet=enabled
+        -Dlua=enabled
         -Drubberband=enabled
-        -Dlcms2=enabled
         -Dspirv-cross=enabled
-        -Dvulkan=enabled
         -Dsubrandr=enabled
+        -Duchardet=enabled
+        -Dvulkan=enabled
         -Dc_args='-Wno-error=int-conversion'
     BUILD_COMMAND ${EXEC} LTO_JOB=1 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ""

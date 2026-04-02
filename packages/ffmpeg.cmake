@@ -46,9 +46,18 @@ ExternalProject_Add(ffmpeg
         --enable-libxml2
         --enable-libplacebo
         --enable-libshaderc
+        --disable-debug
         --disable-doc
         --disable-ffplay
         --disable-ffprobe
+        --disable-indev=gdigrab
+        --disable-indev=vfwcap
+        --disable-outdevs
+        --disable-cuvid
+        --disable-dxva2
+        --disable-sdl2
+        --disable-vaapi
+        --disable-vdpau
         ${ffmpeg_lto}
         --extra-cflags='-Wno-error=int-conversion'
         "--extra-libs='${ffmpeg_extra_libs}'" # -lstdc++ / -lc++ needs by shaderc
