@@ -1,7 +1,6 @@
 ExternalProject_Add(mpv
     DEPENDS
         ffmpeg
-        #rubberband
         fribidi
         lcms2
         libarchive

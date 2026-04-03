@@ -1,48 +1,45 @@
 set_property(DIRECTORY PROPERTY EP_STEP_TARGETS download)
 include(${PROJECT_SOURCE_DIR}/cmake/packages_check.cmake)
 list(APPEND ep
-    uchardet
-    zlib
-    zstd
-    bzip2
-    libjpeg
-    lcms2
-    libpng
-    libiconv
-    luajit
-    fribidi
-    expat
-    libxml2
     brotli
-    freetype2
-    libbluray
-    harfbuzz
-    libsoxr
+    bzip2
+    expat
+    fast_float
+    fribidi
+    glad
+    glslang
     graphengine
-    libzimg
-    fontconfig
+    libiconv
+    libjpeg
+    libsoxr
     libunibreak
-    libass
-    subrandr
     nvcodec-headers
-    xxhash
-    dav1d
-    libwebp
-    openssl
-    libarchive
+    spirv-cross
     spirv-headers
     spirv-tools
-    spirv-cross
-    glslang
+    uchardet
     vulkan-header
+    xxhash
+    zlib
+    zstd
+    lcms2
+    libpng
+    libxml2
+    openssl
+    freetype2
+    harfbuzz
+    libbluray
+    fontconfig
+    libass
+    subrandr
+    libwebp
+    libzimg
+    dav1d
+    luajit
     vulkan
     shaderc
-    glad
-    fast_float
     libplacebo
-    #fftw3
-    #libsamplerate
-    #rubberband
+    libarchive
     ffmpeg
     mpv
     mpv-packaging

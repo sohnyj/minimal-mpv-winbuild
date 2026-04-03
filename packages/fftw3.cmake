@@ -7,9 +7,10 @@ ExternalProject_Add(fftw3
         --host=${TARGET_ARCH}
         --prefix=${MINGW_INSTALL_PREFIX}
         --disable-shared
-        --enable-static
         --enable-avx2
         --enable-fma
+        --enable-static
+        --enable-threads
         --with-our-malloc
     BUILD_COMMAND ${MAKE}
     INSTALL_COMMAND ${MAKE} install
