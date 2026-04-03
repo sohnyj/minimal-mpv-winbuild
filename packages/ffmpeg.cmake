@@ -28,19 +28,6 @@ ExternalProject_Add(ffmpeg
         --arch=${TARGET_CPU}
         --target-os=mingw32
         --pkg-config-flags=--static
-        --disable-cuvid
-        --disable-debug
-        --disable-doc
-        --disable-dxva2
-        --disable-ffplay
-        --disable-ffprobe
-        --disable-indev=dshow
-        --disable-indev=gdigrab
-        --disable-indev=vfwcap
-        --disable-outdevs
-        --disable-sdl2
-        --disable-vaapi
-        --disable-vdpau
         --enable-cross-compile
         --enable-gpl
         --enable-lcms2
@@ -60,6 +47,19 @@ ExternalProject_Add(ffmpeg
         --enable-openssl
         --enable-runtime-cpudetect
         --enable-version3
+        --disable-cuvid
+        --disable-debug
+        --disable-doc
+        --disable-dxva2
+        --disable-ffplay
+        --disable-ffprobe
+        --disable-indev=dshow
+        --disable-indev=gdigrab
+        --disable-indev=vfwcap
+        --disable-outdevs
+        --disable-sdl2
+        --disable-vaapi
+        --disable-vdpau
         ${ffmpeg_lto}
         --extra-cflags='-Wno-error=int-conversion'
         "--extra-libs='${ffmpeg_extra_libs}'" # -lstdc++ / -lc++ needs by shaderc

@@ -97,7 +97,7 @@ After that, build mpv as usual:
 
 ## Information about packages
 
-- Git
+- Git (Nightly)
     - brotli
     - bzip2
     - dav1d
