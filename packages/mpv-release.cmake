@@ -22,14 +22,14 @@ ExternalProject_Add(mpv-release
         libass
         libiconv
         libjpeg
+        libplacebo
         libpng
         luajit
-        uchardet
-        vulkan
         shaderc
-        libplacebo
         spirv-cross
         subrandr
+        uchardet
+        vulkan
     URL ${LINK}
     SOURCE_DIR ${SOURCE_LOCATION}
     CONFIGURE_COMMAND ${EXEC} CONF=1 meson setup <BINARY_DIR> <SOURCE_DIR>
@@ -41,18 +41,21 @@ ExternalProject_Add(mpv-release
         -Doptimization=3
         -Db_lto=true
         ${mpv_lto_mode}
-        -Dpdf-build=disabled
-        -Dlua=enabled
-        -Djavascript=disabled
-        -Dsdl2-gamepad=disabled
+        -Dlcms2=enabled
         -Dlibarchive=enabled
         -Dlibbluray=enabled
-        -Duchardet=enabled
-        -Drubberband=disabled
-        -Dlcms2=enabled
+        -Dlua=enabled
         -Dspirv-cross=enabled
-        -Dvulkan=enabled
         -Dsubrandr=enabled
+        -Duchardet=enabled
+        -Dvulkan=enabled
+        -Dcplugins=disabled
+        -Dd3d9-hwaccel=disabled
+        -Ddirect3d=disabled
+        -Dgl=disabled
+        -Djavascript=disabled
+        -Dlibmpv=false
+        -Drubberband=disabled
         -Dc_args='-Wno-error=int-conversion'
     BUILD_COMMAND ${EXEC} LTO_JOB=1 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ""

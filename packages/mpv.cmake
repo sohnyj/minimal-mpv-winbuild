@@ -7,14 +7,14 @@ ExternalProject_Add(mpv
         libass
         libiconv
         libjpeg
+        libplacebo
         libpng
         luajit
-        uchardet
-        vulkan
         shaderc
-        libplacebo
         spirv-cross
         subrandr
+        uchardet
+        vulkan
     GIT_REPOSITORY https://github.com/mpv-player/mpv.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
@@ -28,21 +28,21 @@ ExternalProject_Add(mpv
         -Doptimization=3
         -Db_lto=true
         ${mpv_lto_mode}
+        -Dlcms2=enabled
+        -Dlibarchive=enabled
+        -Dlibbluray=enabled
+        -Dlua=enabled
+        -Dspirv-cross=enabled
+        -Dsubrandr=enabled
+        -Duchardet=enabled
+        -Dvulkan=enabled
         -Dcplugins=disabled
         -Dd3d9-hwaccel=disabled
         -Ddirect3d=disabled
         -Dgl=disabled
         -Djavascript=disabled
         -Dlibmpv=false
-        -Dlcms2=enabled
-        -Dlibarchive=enabled
-        -Dlibbluray=enabled
-        -Dlua=enabled
         -Drubberband=disabled
-        -Dspirv-cross=enabled
-        -Dsubrandr=enabled
-        -Duchardet=enabled
-        -Dvulkan=enabled
         -Dc_args='-Wno-error=int-conversion'
     BUILD_COMMAND ${EXEC} LTO_JOB=1 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ""

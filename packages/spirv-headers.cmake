@@ -12,7 +12,7 @@ ExternalProject_Add(spirv-headers
         -DCMAKE_INSTALL_PREFIX=${MINGW_INSTALL_PREFIX}
     BUILD_COMMAND ""
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
-    LOG_DOWNLOAD 1 LOG_UPDATE 1
+    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 
 force_rebuild_git(spirv-headers)
