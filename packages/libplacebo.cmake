@@ -2,13 +2,13 @@ get_property(src_glad TARGET glad PROPERTY _EP_SOURCE_DIR)
 get_property(src_fast_float TARGET fast_float PROPERTY _EP_SOURCE_DIR)
 ExternalProject_Add(libplacebo
     DEPENDS
+        glad
+        fast_float
+        xxhash
         vulkan
         shaderc
         spirv-cross
         lcms2
-        glad
-        fast_float
-        xxhash
     GIT_REPOSITORY https://github.com/haasn/libplacebo.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
@@ -24,9 +24,11 @@ ExternalProject_Add(libplacebo
         --libdir=${MINGW_INSTALL_PREFIX}/lib
         --cross-file=${MESON_CROSS}
         --default-library=static
-        -Dd3d11=enabled
         -Doptimization=3
+        -Dd3d11=enabled
         -Dvulkan-registry='${MINGW_INSTALL_PREFIX}/share/vulkan/registry/vk.xml'
+        -Dgl-proc-addr=disabled
+        -Dopengl=disabled
         -Ddemos=false
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
