@@ -7,6 +7,3 @@
 /x86_64*
 /clang_root
 /src_packages
-llvm.profdata
-/*.code-workspace
-/.claude
