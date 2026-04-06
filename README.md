@@ -15,7 +15,7 @@ For easy updates: [sohnyj/app-updater](https://github.com/sohnyj/app-updater)
 - **Audio** — lame, opus (with libopusenc, opusfile, opus-tools, opus-dnn), flac, vorbis, ogg, speex, libopenmpt, libmodplug, game-music-emu, libmysofa, libbs2b, openal-soft, rubberband (with fftw3, libsamplerate)
 - **Image** — libjxl (and highway)
 - **Subtitle** — libaribcaption, libzvbi
-- **Disc playback** — libdvdcss, libdvdread, libdvdnav, libudfread
+- **Disc playback** — libdvdcss, libdvdread, libdvdnav
 - **Network** — curl, libssh, libsrt, megasdk (with cryptopp, libsodium, libuv, sqlite, readline, termcap)
 - **Graphics** — ANGLE headers
 - **Hardware acceleration** — amf-headers, libmfx, libva, libvpl
@@ -110,7 +110,7 @@ After that, build mpv as usual:
     - lcms2
     - libarchive
     - libass
-    - libbluray
+    - libbluray (with libudfread)
     - libjpeg
     - libplacebo (with glad, fast_float, xxhash)
     - libpng

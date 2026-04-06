@@ -28,6 +28,7 @@ list(APPEND ep
     openssl
     freetype2
     harfbuzz
+    libudfread
     libbluray
     fontconfig
     libass

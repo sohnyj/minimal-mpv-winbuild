@@ -2,6 +2,7 @@ ExternalProject_Add(libbluray
     DEPENDS
         freetype2
         libxml2
+        libudfread
     GIT_REPOSITORY https://code.videolan.org/videolan/libbluray.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
