@@ -3,11 +3,13 @@
 This fork is tailored for typical playback scenarios, removing video/audio encoding libraries, legacy formats, specialized formats, and rare protocol support.
 Encoding libraries (x264, x265, aom, lame, opus, flac, etc.) are only needed for encoding/transcoding — **FFmpeg's decoding and playback functionality remains fully intact.**
 Image encoding is limited to jpg, webp, and png via libjpeg, libwebp, and libpng.
+
 Only Vulkan and Direct3D 11+ are supported for GPU acceleration, with nvcodec.
 
 Autobuild runs daily at UTC 00:00.
 
-For easy updates: [sohnyj/app-updater](https://github.com/sohnyj/app-updater)
+- For easy updates: [sohnyj/app-updater](https://github.com/sohnyj/app-updater)
+- mpv single-instance launcher: [sohnyj/umpv-rust](https://github.com/sohnyj/umpv-rust)
 
 ## What's removed
 
