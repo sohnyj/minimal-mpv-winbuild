@@ -1,15 +1,15 @@
 # CMake-based MinGW-w64 Cross Toolchain
 
 This fork is tailored for typical playback scenarios, removing video/audio encoding libraries, legacy formats, specialized formats, and rare protocol support.
-Encoding libraries (x264, x265, aom, lame, opus, flac, etc.) are only needed for encoding/transcoding — **FFmpeg's decoding and playback functionality remains fully intact.**
+Encoding libraries are only needed for encoding/transcoding, not playback — **FFmpeg's built-in decoders cover all common formats.**
 Image encoding is limited to jpg, webp, and png via libjpeg, libwebp, and libpng.
 
-Only Vulkan and Direct3D 11+ are supported for GPU acceleration, with nvcodec.
+Only Vulkan and Direct3D 11+ are supported for GPU acceleration, with nvidia(nvcodec), amd(AMF), and intel(libvpl).
 
 Autobuild runs daily at UTC 00:00.
 
 - For easy updates: [sohnyj/app-updater](https://github.com/sohnyj/app-updater)
-- mpv single-instance launcher: [sohnyj/umpv-rust](https://github.com/sohnyj/umpv-rust)
+- single-instance mpv launcher: [sohnyj/umpv-rust](https://github.com/sohnyj/umpv-rust)
 
 ## What's removed
 
@@ -20,7 +20,7 @@ Autobuild runs daily at UTC 00:00.
 - **Disc playback** — libdvdcss, libdvdread, libdvdnav
 - **Network** — curl, libssh, libsrt, megasdk (with cryptopp, libsodium, libuv, sqlite, readline, termcap)
 - **Graphics** — ANGLE headers
-- **Hardware acceleration** — amf-headers, libmfx, libva, libvpl
+- **Hardware acceleration** — libmfx, libva
 - **Scripting** — mujs
 - **Input** — libsdl2
 - **Compression** — xz (LZMA), lzo
@@ -100,6 +100,7 @@ After that, build mpv as usual:
 ## Information about packages
 
 - Git (Nightly)
+    - amf-headers
     - brotli
     - bzip2
     - dav1d
@@ -118,6 +119,7 @@ After that, build mpv as usual:
     - libpng
     - libsoxr
     - libunibreak
+    - libvpl
     - libwebp
     - libxml2
     - libzimg (with graphengine)

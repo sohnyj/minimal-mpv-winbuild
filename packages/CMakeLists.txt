@@ -1,6 +1,7 @@
 set_property(DIRECTORY PROPERTY EP_STEP_TARGETS download)
 include(${PROJECT_SOURCE_DIR}/cmake/packages_check.cmake)
 list(APPEND ep
+    amf-headers
     brotli
     bzip2
     expat
@@ -13,6 +14,7 @@ list(APPEND ep
     libjpeg
     libsoxr
     libunibreak
+    libvpl
     nvcodec-headers
     spirv-cross
     spirv-headers

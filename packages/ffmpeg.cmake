@@ -1,5 +1,6 @@
 ExternalProject_Add(ffmpeg
     DEPENDS
+        amf-headers
         spirv-headers
         nvcodec-headers
         bzip2
@@ -9,6 +10,7 @@ ExternalProject_Add(ffmpeg
         libbluray
         libpng
         libsoxr
+        libvpl
         libwebp
         libzimg
         fontconfig
@@ -28,6 +30,7 @@ ExternalProject_Add(ffmpeg
         --arch=${TARGET_CPU}
         --target-os=mingw32
         --pkg-config-flags=--static
+        --enable-amf
         --enable-cross-compile
         --enable-gpl
         --enable-lcms2
@@ -41,6 +44,7 @@ ExternalProject_Add(ffmpeg
         --enable-libplacebo
         --enable-libshaderc
         --enable-libsoxr
+        --enable-libvpl
         --enable-libwebp
         --enable-libxml2
         --enable-libzimg
