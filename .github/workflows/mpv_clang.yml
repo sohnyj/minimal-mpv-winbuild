@@ -20,6 +20,8 @@ jobs:
   build_mpv:
     name: Building mpv (${{ matrix.llvm_arch }})
     runs-on: ubuntu-latest
+    outputs:
+      cache_version: ${{ steps.cache_version.outputs.value }}
     strategy:
       fail-fast: false
       matrix:
@@ -51,31 +53,38 @@ jobs:
         with:
           ref: master
 
+      - name: Set cache version
+        id: cache_version
+        run: echo "value=$(date -u +'%Y%m%d')" >> $GITHUB_OUTPUT
+
       - name: Loading clang sysroot cache
         uses: actions/cache/restore@main
         with:
           path: |
             clang_root
-          key: ${{ secrets.CACHE_VERSION }}-clang_root-${{ github.run_id }}
+          key: clang_root-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
           restore-keys: |
-            ${{ secrets.CACHE_VERSION }}-clang_root
+            clang_root-${{ steps.cache_version.outputs.value }}
+            clang_root-
 
       - name: Loading repository cache
         uses: actions/cache/restore@main
         with:
           path: src_packages
-          key: ${{ secrets.CACHE_VERSION }}-repository-${{ github.run_id }}
+          key: repository-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
           restore-keys: |
-            ${{ secrets.CACHE_VERSION }}-repository
+            repository-${{ steps.cache_version.outputs.value }}
+            repository-
 
       - name: Loading ${{ matrix.x86_64_level }} toolchain cache
         uses: actions/cache/restore@main
         with:
           path: |
             ${{ env.BUILD_DIR }}
-          key: ${{ secrets.CACHE_VERSION }}-clang-${{ matrix.x86_64_level }}_toolchain-${{ github.run_id }}
+          key: clang-${{ matrix.x86_64_level }}_toolchain-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
           restore-keys: |
-            ${{ secrets.CACHE_VERSION }}-clang-${{ matrix.x86_64_level }}_toolchain
+            clang-${{ matrix.x86_64_level }}_toolchain-${{ steps.cache_version.outputs.value }}
+            clang-${{ matrix.x86_64_level }}_toolchain-
 
       - name: Running custom command
         if: ${{ github.event.inputs.command != '' }}
@@ -141,14 +150,14 @@ jobs:
         with:
           path: |
             clang_root
-          key: ${{ secrets.CACHE_VERSION }}-clang_root-${{ github.run_id }}
+          key: clang_root-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
 
       - name: Saving repository cache
         uses: actions/cache/save@main
         if: always()
         with:
           path: src_packages
-          key: ${{ secrets.CACHE_VERSION }}-repository-${{ github.run_id }}
+          key: repository-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
 
       - name: Saving ${{ matrix.x86_64_level }} toolchain cache
         uses: actions/cache/save@main
@@ -156,13 +165,13 @@ jobs:
         with:
           path: |
             ${{ env.BUILD_DIR }}
-          key: ${{ secrets.CACHE_VERSION }}-clang-${{ matrix.x86_64_level }}_toolchain-${{ github.run_id }}
+          key: clang-${{ matrix.x86_64_level }}_toolchain-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
 
       - name: Saving release cache
         uses: actions/cache/save@main
         with:
           path: release_${{ matrix.x86_64_level }}
-          key: ${{ secrets.CACHE_VERSION }}-release_${{ matrix.x86_64_level }}-${{ github.run_id }}
+          key: release_${{ matrix.x86_64_level }}-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
 
   release:
     name: Upload releases
@@ -171,8 +180,8 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       CURL_RETRIES: "--connect-timeout 60 --retry 999 --retry-delay 5 --retry-all-errors"
-      release_v3_key: ${{ secrets.CACHE_VERSION }}-release_v3-${{ github.run_id }}
-      release_znver3_key: ${{ secrets.CACHE_VERSION }}-release_znver3-${{ github.run_id }}
+      release_v3_key: release_v3-${{ needs.build_mpv.outputs.cache_version }}-${{ github.run_id }}
+      release_znver3_key: release_znver3-${{ needs.build_mpv.outputs.cache_version }}-${{ github.run_id }}
     steps:
       - name: Installing dependencies
         run: |

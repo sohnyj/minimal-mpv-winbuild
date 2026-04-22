@@ -42,14 +42,20 @@ jobs:
         with:
           ref: master
 
+      - name: Set cache version
+        id: cache_version
+        run: echo "value=$(date -u +'%Y%m%d')" >> $GITHUB_OUTPUT
+
       - name: Loading clang root
         id: clang_root_cache
         if: ${{ github.event.inputs.fresh_build != 'true' }}
         uses: actions/cache/restore@main
         with:
           path: clang_root
-          key: ${{ secrets.CACHE_VERSION }}-clang_root-${{ github.run_id }}
-          restore-keys: ${{ secrets.CACHE_VERSION }}-clang_root
+          key: clang_root-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
+          restore-keys: |
+            clang_root-${{ steps.cache_version.outputs.value }}
+            clang_root-
 
       - name: Loading x86_64 toolchain
         id: x86_64_cache
@@ -57,8 +63,10 @@ jobs:
         uses: actions/cache/restore@main
         with:
           path: build_x86_64
-          key: ${{ secrets.CACHE_VERSION }}-clang-x86_64_toolchain-${{ github.run_id }}
-          restore-keys: ${{ secrets.CACHE_VERSION }}-clang-x86_64_toolchain
+          key: clang-x86_64_toolchain-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
+          restore-keys: |
+            clang-x86_64_toolchain-${{ steps.cache_version.outputs.value }}
+            clang-x86_64_toolchain-
 
       - name: Loading x86_64-v3 toolchain
         id: v3_cache
@@ -66,8 +74,10 @@ jobs:
         uses: actions/cache/restore@main
         with:
           path: build_x86_64-v3
-          key: ${{ secrets.CACHE_VERSION }}-clang-v3_toolchain-${{ github.run_id }}
-          restore-keys: ${{ secrets.CACHE_VERSION }}-clang-v3_toolchain
+          key: clang-v3_toolchain-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
+          restore-keys: |
+            clang-v3_toolchain-${{ steps.cache_version.outputs.value }}
+            clang-v3_toolchain-
 
       - name: Loading x86_64-znver3 toolchain
         id: znver3_cache
@@ -75,8 +85,10 @@ jobs:
         uses: actions/cache/restore@main
         with:
           path: build_x86_64-znver3
-          key: ${{ secrets.CACHE_VERSION }}-clang-znver3_toolchain-${{ github.run_id }}
-          restore-keys: ${{ secrets.CACHE_VERSION }}-clang-znver3_toolchain
+          key: clang-znver3_toolchain-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
+          restore-keys: |
+            clang-znver3_toolchain-${{ steps.cache_version.outputs.value }}
+            clang-znver3_toolchain-
 
       - name: Loading repository cache
         id: repository_cache
@@ -84,8 +96,10 @@ jobs:
         uses: actions/cache/restore@main
         with:
           path: src_packages
-          key: ${{ secrets.CACHE_VERSION }}-repository-${{ github.run_id }}
-          restore-keys: ${{ secrets.CACHE_VERSION }}-repository
+          key: repository-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
+          restore-keys: |
+            repository-${{ steps.cache_version.outputs.value }}
+            repository-
 
       - name: Running custom command
         if: ${{ github.event.inputs.command != '' }}
@@ -168,32 +182,32 @@ jobs:
         uses: actions/cache/save@main
         with:
           path: clang_root
-          key: ${{ secrets.CACHE_VERSION }}-clang_root-${{ github.run_id }}
+          key: clang_root-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
 
       - name: Saving x86_64 toolchain
         uses: actions/cache/save@main
         with:
           path: build_x86_64
-          key: ${{ secrets.CACHE_VERSION }}-clang-x86_64_toolchain-${{ github.run_id }}
+          key: clang-x86_64_toolchain-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
 
       - name: Saving x86_64-v3 toolchain
         uses: actions/cache/save@main
         with:
           path: build_x86_64-v3
-          key: ${{ secrets.CACHE_VERSION }}-clang-v3_toolchain-${{ github.run_id }}
+          key: clang-v3_toolchain-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
 
       - name: Saving x86_64-znver3 toolchain
         uses: actions/cache/save@main
         with:
           path: build_x86_64-znver3
-          key: ${{ secrets.CACHE_VERSION }}-clang-znver3_toolchain-${{ github.run_id }}
+          key: clang-znver3_toolchain-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
 
       - name: Saving repository cache
         if: false
         uses: actions/cache/save@main
         with:
           path: src_packages
-          key: ${{ secrets.CACHE_VERSION }}-repository-${{ github.run_id }}
+          key: repository-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
 
   call_workflow:
     name: Run mpv_clang
