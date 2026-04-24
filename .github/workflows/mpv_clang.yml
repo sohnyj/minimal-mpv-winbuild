@@ -217,7 +217,7 @@ jobs:
         if: ${{ github.event_name == 'schedule' || github.event.inputs.github_release == 'true' }}
         continue-on-error: true
         run: |
-          tag=$(date "+%Y-%m-%d")-$(git rev-parse --short HEAD)
+          tag=$(date "+%Y%m%d-%H%M%S")-$(git rev-parse --short HEAD)
           name=$(date "+%Y-%m-%d %H:%M")
           body=$(cat <<END
           ![GitHub release (by tag)](https://img.shields.io/github/downloads/sohnyj/minimal-mpv-winbuild/$tag/total?label=Downloads)
