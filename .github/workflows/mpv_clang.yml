@@ -217,7 +217,8 @@ jobs:
         if: ${{ github.event_name == 'schedule' || github.event.inputs.github_release == 'true' }}
         continue-on-error: true
         run: |
-          tag=$(date "+%Y%m%d-%H%M%S")
+          tag=$(date "+%Y%m%d-%H%M%S")-$(git rev-parse --short HEAD)
+          name=$(date "+%Y-%m-%d %H:%M")
           body=$(cat <<END
           ![GitHub release (by tag)](https://img.shields.io/github/downloads/sohnyj/minimal-mpv-winbuild/$tag/total?label=Downloads)
 
@@ -227,7 +228,7 @@ jobs:
           id=$(curl -u sohnyj:$GH_TOKEN $CURL_RETRIES -s -X POST -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/sohnyj/minimal-mpv-winbuild/releases -d @- <<END | jq -r '.id'
           {
             "tag_name": "$tag",
-            "name": "$tag",
+            "name": "$name",
             "body": "$(echo ${body//$'\n'/'\n'})"
           }
           END
