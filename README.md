@@ -4,7 +4,7 @@ This fork is tailored for typical playback scenarios, removing video/audio encod
 Encoding libraries are only needed for encoding/transcoding, not playback — **FFmpeg's built-in decoders cover all common formats.**
 Image encoding is limited to jpg, webp, and png via libjpeg, libwebp, and libpng.
 
-Only Vulkan and Direct3D 11+ are supported for GPU acceleration, with nvidia(nvcodec), amd(AMF), and intel(libvpl).
+Only Vulkan and Direct3D 11+ are supported for GPU acceleration, with nvidia(nvcodec-headers), amd(amf-headers), and intel(libvpl).
 
 Autobuild runs daily at UTC 00:00.
 
