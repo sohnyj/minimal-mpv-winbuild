@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       cache_version: ${{ steps.cache_version.outputs.value }}
+      mpv_shorthead: ${{ steps.source_revisions.outputs.mpv }}
+      ffmpeg_shorthead: ${{ steps.source_revisions.outputs.ffmpeg }}
     strategy:
       fail-fast: false
       matrix:
@@ -107,24 +109,30 @@ jobs:
           mkdir -p release_${{ matrix.x86_64_level }}
           ninja -C $BUILD_DIR mpv-packaging; mv $BUILD_DIR/mpv*.7z release_${{ matrix.x86_64_level }} || true
 
+      - name: Recording source revisions
+        id: source_revisions
+        run: |
+          mpv_hash=$(git -C src_packages/mpv rev-parse --short HEAD)
+          ffmpeg_hash=$(git -C src_packages/ffmpeg rev-parse --short HEAD)
+          echo "mpv=$mpv_hash" >> $GITHUB_OUTPUT
+          echo "ffmpeg=$ffmpeg_hash" >> $GITHUB_OUTPUT
+
       - name: Copying ffmpeg
         run: |
-          hash=$(git -C src_packages/ffmpeg rev-parse --short HEAD)
-          7z a -m0=lzma2 -mx=9 -ms=on release_${{ matrix.x86_64_level }}/ffmpeg-$BIT-${{ matrix.x86_64_level }}-git-$hash.7z ./$BUILD_DIR/$BIT-${{ matrix.x86_64_level }}-w64-mingw32/bin/ffmpeg.exe
+          7z a -m0=lzma2 -mx=9 -ms=on release_${{ matrix.x86_64_level }}/ffmpeg-$BIT-${{ matrix.x86_64_level }}-git-${{ steps.source_revisions.outputs.ffmpeg }}.7z ./$BUILD_DIR/$BIT-${{ matrix.x86_64_level }}-w64-mingw32/bin/ffmpeg.exe
 
       - name: Collecting logs
         if: always()
         run: |
           mkdir -p ${BUILD_DIR}_logs
           cp -fr $(find $BUILD_DIR -type f -iname "*-*.log" -or -wholename "*/ffbuild/config.log") ${BUILD_DIR}_logs || true
-          7z a -m0=lzma2 -mx=9 -ms=on logs.7z ${BUILD_DIR}_logs
 
       - name: Uploading logs
         uses: actions/upload-artifact@master
         if: always()
         with:
           name: mpv-x86_64-${{ matrix.x86_64_level }}-logs
-          path: logs.7z
+          path: ${{ env.BUILD_DIR }}_logs/**
           retention-days: 1
 
       - name: Uploading x86_64-${{ matrix.x86_64_level }} build
@@ -220,9 +228,12 @@ jobs:
           tag=$(date "+%Y%m%d-%H%M%S")-$(git rev-parse --short HEAD)
           name=$(date "+%Y-%m-%d %H:%M")
           body=$(cat <<END
-          ![GitHub release (by tag)](https://img.shields.io/github/downloads/sohnyj/minimal-mpv-winbuild/$tag/total?label=Downloads)
+          **mpv**: [${{ needs.build_mpv.outputs.mpv_shorthead }}](https://github.com/mpv-player/mpv/commit/${{ needs.build_mpv.outputs.mpv_shorthead }})
+          **ffmpeg**: [${{ needs.build_mpv.outputs.ffmpeg_shorthead }}](https://github.com/FFmpeg/FFmpeg/commit/${{ needs.build_mpv.outputs.ffmpeg_shorthead }})
 
-          **Workflow run**: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+          **Workflow run**: [$GITHUB_RUN_ID]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
+
+          ![GitHub release (by tag)](https://img.shields.io/github/downloads/sohnyj/minimal-mpv-winbuild/$tag/total?label=Downloads)
           END
           )
           id=$(curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES -s -X POST -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/sohnyj/minimal-mpv-winbuild/releases -d @- <<END | jq -r '.id'

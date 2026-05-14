@@ -150,14 +150,13 @@ jobs:
           cp -fr $(find build_x86_64 -type f -iname "*-*.log") build_x86_64_logs || true
           cp -fr $(find build_x86_64-v3 -type f -iname "*-*.log") build_x86_64-v3_logs || true
           cp -fr $(find build_x86_64-znver3 -type f -iname "*-*.log") build_x86_64-znver3_logs || true
-          7z a -m0=lzma2 -mx=9 -ms=on logs.7z build*logs
 
       - name: Uploading logs
         uses: actions/upload-artifact@master
         if: always()
         with:
           name: logs
-          path: logs.7z
+          path: build*logs/**
           retention-days: 1
 
       - name: Uploading toolchain
