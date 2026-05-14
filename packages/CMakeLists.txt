@@ -4,7 +4,6 @@ list(APPEND ep
     amf-headers
     brotli
     bzip2
-    expat
     fast_float
     fribidi
     glad

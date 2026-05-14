@@ -104,7 +104,6 @@ After that, build mpv as usual:
     - brotli
     - bzip2
     - dav1d
-    - expat
     - FFmpeg
     - fontconfig
     - freetype2
