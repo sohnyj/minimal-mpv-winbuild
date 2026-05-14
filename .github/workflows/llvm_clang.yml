@@ -6,14 +6,10 @@ defaults:
 on:
   workflow_dispatch:
     inputs:
-      command:
-        description: 'Run custom command before building'
-        required: false
-        type: string
       fresh_build:
         description: 'Ignore cache and rebuild from scratch'
         required: false
-        default: false
+        default: true
         type: boolean
 
 jobs:
@@ -87,11 +83,6 @@ jobs:
           restore-keys: |
             clang-znver3_toolchain-${{ steps.cache_version.outputs.value }}
             clang-znver3_toolchain-
-
-      - name: Running custom command
-        if: ${{ github.event.inputs.command != '' }}
-        continue-on-error: true
-        run: ${{ github.event.inputs.command }}
 
       - name: Building LLVM with IR Profile Instrumentation
         if: ${{ steps.clang_root_cache.outputs.cache-matched-key == '' }}

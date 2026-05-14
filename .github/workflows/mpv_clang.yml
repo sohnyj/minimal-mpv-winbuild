@@ -6,10 +6,6 @@ defaults:
 on:
   workflow_dispatch:
     inputs:
-      command:
-        description: 'Run custom command before building'
-        required: false
-        type: string
       github_release:
         description: 'Upload to Github release'
         required: false
@@ -87,11 +83,6 @@ jobs:
           restore-keys: |
             clang-${{ matrix.x86_64_level }}_toolchain-${{ steps.cache_version.outputs.value }}
             clang-${{ matrix.x86_64_level }}_toolchain-
-
-      - name: Running custom command
-        if: ${{ github.event.inputs.command != '' }}
-        continue-on-error: true
-        run: ${{ github.event.inputs.command }}
 
       - name: Configuring CMake & Downloading source
         run: |
