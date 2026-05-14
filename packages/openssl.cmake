@@ -22,8 +22,10 @@ ExternalProject_Add(openssl
         zlib
         enable-brotli
         enable-zstd
+        no-afalgeng
         no-apps
         no-aria
+        no-async
         no-bf
         no-camellia
         no-capieng
@@ -38,17 +40,22 @@ ExternalProject_Add(openssl
         no-docs
         no-dsa
         no-dso
+        no-dtls
         no-ec2m
+        no-engine
         no-err
         no-filenames
         no-gost
         no-idea
+        no-ktls
         no-legacy
         no-md2
         no-md4
         no-mdc2
         no-module
         no-ocsp
+        no-padlockeng
+        no-quic
         no-rc2
         no-rc4
         no-rc5
@@ -61,7 +68,6 @@ ExternalProject_Add(openssl
         no-sm4
         no-srp
         no-ssl3
-        no-ssl3-method
         no-tests
         no-ts
         no-whirlpool
