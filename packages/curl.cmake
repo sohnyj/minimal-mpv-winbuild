@@ -1,6 +1,8 @@
 ExternalProject_Add(curl
     DEPENDS
         zlib
+        zstd
+        brotli
         openssl
     GIT_REPOSITORY https://github.com/curl/curl.git
     SOURCE_DIR ${SOURCE_LOCATION}
@@ -30,6 +32,8 @@ ExternalProject_Add(curl
         -DCURL_DISABLE_WEBSOCKETS=ON
         -DCURL_USE_OPENSSL=ON
         -DCURL_USE_ZLIB=ON
+        -DCURL_ZSTD=ON
+        -DCURL_BROTLI=ON
         -DBUILD_CURL_EXE=OFF
         -DBUILD_EXAMPLES=OFF
         -DBUILD_LIBCURL_DOCS=OFF
