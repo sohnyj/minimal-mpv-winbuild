@@ -146,17 +146,17 @@ jobs:
       - name: Collecting logs
         if: always()
         run: |
-          mkdir -p build_x86_64_logs build_x86_64-v3_logs build_x86_64-znver3_logs
-          cp -fr $(find build_x86_64 -type f -iname "*-*.log") build_x86_64_logs || true
-          cp -fr $(find build_x86_64-v3 -type f -iname "*-*.log") build_x86_64-v3_logs || true
-          cp -fr $(find build_x86_64-znver3 -type f -iname "*-*.log") build_x86_64-znver3_logs || true
+          mkdir -p logs/build_x86_64_logs logs/build_x86_64-v3_logs logs/build_x86_64-znver3_logs
+          cp -fr $(find build_x86_64 -type f -iname "*-*.log") logs/build_x86_64_logs || true
+          cp -fr $(find build_x86_64-v3 -type f -iname "*-*.log") logs/build_x86_64-v3_logs || true
+          cp -fr $(find build_x86_64-znver3 -type f -iname "*-*.log") logs/build_x86_64-znver3_logs || true
 
       - name: Uploading logs
         uses: actions/upload-artifact@master
         if: always()
         with:
           name: logs
-          path: build*logs/**
+          path: logs/**
           retention-days: 1
 
       - name: Uploading toolchain
