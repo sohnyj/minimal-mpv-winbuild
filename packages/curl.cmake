@@ -1,25 +1,52 @@
 ExternalProject_Add(curl
     DEPENDS
-        mbedtls
+        zlib
+        openssl
     GIT_REPOSITORY https://github.com/curl/curl.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
-    PATCH_COMMAND ${EXEC} git am --3way ${CMAKE_CURRENT_SOURCE_DIR}/curl-*.patch
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${EXEC} autoreconf -fi && CONF=1 <SOURCE_DIR>/configure
-        --host=${TARGET_ARCH}
-        --prefix=${MINGW_INSTALL_PREFIX}
-        --disable-shared
-        --with-mbedtls=${MINGW_INSTALL_PREFIX}
-    BUILD_COMMAND ${MAKE}
-    INSTALL_COMMAND ${MAKE} install
-    BUILD_IN_SOURCE 1
+    CONFIGURE_COMMAND ${EXEC} CONF=1 cmake -H<SOURCE_DIR> -B<BINARY_DIR>
+        -G Ninja
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}
+        -DCMAKE_INSTALL_PREFIX=${MINGW_INSTALL_PREFIX}
+        -DCMAKE_FIND_ROOT_PATH=${MINGW_INSTALL_PREFIX}
+        -DCURL_DISABLE_AWS=ON
+        -DCURL_DISABLE_DICT=ON
+        -DCURL_DISABLE_FILE=ON
+        -DCURL_DISABLE_GOPHER=ON
+        -DCURL_DISABLE_IMAP=ON
+        -DCURL_DISABLE_IPFS=ON
+        -DCURL_DISABLE_KERBEROS_AUTH=ON
+        -DCURL_DISABLE_LDAP=ON
+        -DCURL_DISABLE_MQTT=ON
+        -DCURL_DISABLE_NEGOTIATE_AUTH=ON
+        -DCURL_DISABLE_POP3=ON
+        -DCURL_DISABLE_RTSP=ON
+        -DCURL_DISABLE_SMTP=ON
+        -DCURL_DISABLE_TELNET=ON
+        -DCURL_DISABLE_TFTP=ON
+        -DCURL_DISABLE_WEBSOCKETS=ON
+        -DCURL_USE_OPENSSL=ON
+        -DCURL_USE_ZLIB=ON
+        -DBUILD_CURL_EXE=OFF
+        -DBUILD_EXAMPLES=OFF
+        -DBUILD_LIBCURL_DOCS=OFF
+        -DBUILD_MISC_DOCS=OFF
+        -DBUILD_SHARED_LIBS=OFF
+        -DBUILD_TESTING=OFF
+        -DCURL_USE_LIBPSL=OFF
+        -DCURL_USE_LIBSSH2=OFF
+        -DCURL_USE_SCHANNEL=OFF
+        -DENABLE_CURL_MANUAL=OFF
+        -DPICKY_COMPILER=OFF
+        -DUSE_LIBIDN2=OFF
+        -DUSE_NGHTTP2=OFF
+    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
+    INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 
 force_rebuild_git(curl)
 cleanup(curl install)
-
-# Download the cacert.pem file: https://curl.haxx.se/docs/caextract.html
-# Rename the cacert.pem file to curl-ca-bundle.crt
-# Put in same directory as curl.exe
