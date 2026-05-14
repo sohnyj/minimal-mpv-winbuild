@@ -20,8 +20,6 @@ jobs:
   build_llvm:
     name: Building LLVM and Clang
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
       - name: Installing dependencies
         run: |
@@ -146,17 +144,33 @@ jobs:
       - name: Collecting logs
         if: always()
         run: |
-          mkdir -p logs/build_x86_64_logs logs/build_x86_64-v3_logs logs/build_x86_64-znver3_logs
-          cp -fr $(find build_x86_64 -type f -iname "*-*.log") logs/build_x86_64_logs || true
-          cp -fr $(find build_x86_64-v3 -type f -iname "*-*.log") logs/build_x86_64-v3_logs || true
-          cp -fr $(find build_x86_64-znver3 -type f -iname "*-*.log") logs/build_x86_64-znver3_logs || true
+          mkdir -p llvm-x86_64-logs llvm-x86_64-v3-logs llvm-x86_64-znver3-logs
+          cp -fr $(find build_x86_64 -type f -iname "*-*.log") llvm-x86_64-logs || true
+          cp -fr $(find build_x86_64-v3 -type f -iname "*-*.log") llvm-x86_64-v3-logs || true
+          cp -fr $(find build_x86_64-znver3 -type f -iname "*-*.log") llvm-x86_64-znver3-logs || true
 
-      - name: Uploading logs
+      - name: Uploading x86_64 logs
         uses: actions/upload-artifact@master
         if: always()
         with:
-          name: logs
-          path: logs/**
+          name: llvm-x86_64-logs
+          path: llvm-x86_64-logs
+          retention-days: 1
+
+      - name: Uploading x86_64-v3 logs
+        uses: actions/upload-artifact@master
+        if: always()
+        with:
+          name: llvm-x86_64-v3-logs
+          path: llvm-x86_64-v3-logs
+          retention-days: 1
+
+      - name: Uploading x86_64-znver3 logs
+        uses: actions/upload-artifact@master
+        if: always()
+        with:
+          name: llvm-x86_64-znver3-logs
+          path: llvm-x86_64-znver3-logs
           retention-days: 1
 
       - name: Uploading toolchain

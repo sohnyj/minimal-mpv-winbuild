@@ -99,7 +99,6 @@ jobs:
           ninja -C $BUILD_DIR download || true
 
       - name: Building mpv
-        id: build_mpv_step
         run: |
           ninja -C $BUILD_DIR update
           ninja -C $BUILD_DIR mpv
@@ -134,7 +133,7 @@ jobs:
         if: always()
         with:
           name: mpv-x86_64-${{ matrix.x86_64_level }}-logs
-          path: mpv-x86_64-${{ matrix.x86_64_level }}-logs/**
+          path: mpv-x86_64-${{ matrix.x86_64_level }}-logs
           retention-days: 1
 
       - name: Uploading x86_64-${{ matrix.x86_64_level }} build
