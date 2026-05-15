@@ -3,7 +3,6 @@ ExternalProject_Add(curl
         zlib
         zstd
         brotli
-        openssl
     GIT_REPOSITORY https://github.com/curl/curl.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
@@ -30,7 +29,8 @@ ExternalProject_Add(curl
         -DCURL_DISABLE_TELNET=ON
         -DCURL_DISABLE_TFTP=ON
         -DCURL_DISABLE_WEBSOCKETS=ON
-        -DCURL_USE_OPENSSL=ON
+        -DCURL_USE_OPENSSL=OFF
+        -DCURL_USE_SCHANNEL=ON
         -DCURL_USE_ZLIB=ON
         -DCURL_ZSTD=ON
         -DCURL_BROTLI=ON
@@ -42,7 +42,6 @@ ExternalProject_Add(curl
         -DBUILD_TESTING=OFF
         -DCURL_USE_LIBPSL=OFF
         -DCURL_USE_LIBSSH2=OFF
-        -DCURL_USE_SCHANNEL=OFF
         -DENABLE_CURL_MANUAL=OFF
         -DPICKY_COMPILER=OFF
         -DUSE_LIBIDN2=OFF
