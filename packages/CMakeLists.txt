@@ -43,6 +43,7 @@ list(APPEND ep
     libplacebo
     libarchive
     ffmpeg
+    libpsl
     nghttp2
     nghttp3
     ngtcp2
