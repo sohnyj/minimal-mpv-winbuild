@@ -1,5 +1,6 @@
 ExternalProject_Add(mpv
     DEPENDS
+        curl
         ffmpeg
         fribidi
         lcms2
@@ -31,6 +32,7 @@ ExternalProject_Add(mpv
         -Dlcms2=enabled
         -Dlibarchive=enabled
         -Dlibbluray=enabled
+        -Dlibcurl=enabled
         -Dlua=enabled
         -Dspirv-cross=enabled
         -Dsubrandr=enabled
