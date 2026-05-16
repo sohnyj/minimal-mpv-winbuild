@@ -43,6 +43,9 @@ list(APPEND ep
     libplacebo
     libarchive
     ffmpeg
+    nghttp2
+    nghttp3
+    ngtcp2
     mpv
     mpv-packaging
 )
