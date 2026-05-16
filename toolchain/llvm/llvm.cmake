@@ -15,7 +15,7 @@ ExternalProject_Add(llvm
         -DCMAKE_C_COMPILER=clang
         -DCMAKE_CXX_COMPILER=clang++
         ${llvm_ccache}
-        -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON
+        -DCMAKE_BUILD_WITH_INSTALL_RPATH=OFF
         -DCMAKE_CXX_STANDARD=20
         -DCMAKE_CXX_SCAN_FOR_MODULES=OFF
         -DCMAKE_CXX_COMPILER_CLANG_SCAN_DEPS=OFF
@@ -171,8 +171,8 @@ ExternalProject_Add(llvm
         -DLLVM_TOOL_XCODE_TOOLCHAIN_BUILD=OFF
         -DLLVM_TOOL_YAML2OBJ_BUILD=OFF
         "-DLLVM_THINLTO_CACHE_PATH='${CMAKE_INSTALL_PREFIX}/llvm-thinlto'"
-        "-DCMAKE_C_FLAGS='-g0 ${llvm_lto} ${llvm_pgo}'"
-        "-DCMAKE_CXX_FLAGS='-g0 ${llvm_lto} ${llvm_pgo}'"
+        "-DCMAKE_C_FLAGS='-g0 -ftls-model=local-exec ${llvm_lto} ${llvm_pgo}'"
+        "-DCMAKE_CXX_FLAGS='-g0 -ftls-model=local-exec ${llvm_lto} ${llvm_pgo}'"
         "-DCMAKE_EXE_LINKER_FLAGS='-fuse-ld=lld -Xlinker -s -Xlinker --icf=all -Xlinker --thinlto-cache-policy=cache_size_bytes=1g:prune_interval=1m'"
         -DLLVM_TOOLCHAIN_TOOLS='llvm-driver,llvm-ar,llvm-ranlib,llvm-objdump,llvm-rc,llvm-cvtres,llvm-nm,llvm-strings,llvm-readobj,llvm-dlltool,llvm-objcopy,llvm-strip,llvm-cov,llvm-profdata,llvm-addr2line,llvm-symbolizer,llvm-windres,llvm-ml,llvm-readelf,llvm-size,llvm-config'
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
