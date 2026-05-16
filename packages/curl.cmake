@@ -1,6 +1,7 @@
 ExternalProject_Add(curl
     DEPENDS
         brotli
+        libpsl
         nghttp2
         nghttp3
         ngtcp2
@@ -43,7 +44,7 @@ ExternalProject_Add(curl
         -DCURL_DISABLE_TELNET=ON
         -DCURL_DISABLE_TFTP=ON
         -DCURL_DISABLE_WEBSOCKETS=ON
-        -DCURL_USE_LIBPSL=OFF
+        -DCURL_USE_LIBPSL=ON
         -DCURL_USE_LIBSSH=OFF
         -DCURL_USE_LIBSSH2=OFF
         -DCURL_USE_OPENSSL=ON
@@ -62,9 +63,8 @@ ExternalProject_Add(curl
         -DUSE_NGTCP2=ON
         -DUSE_SSLS_EXPORT=ON
         -DUSE_WIN32_IDN=ON
-        -DUSE_WINDOWS_SSPI=ON
         -DCMAKE_DISABLE_FIND_PACKAGE_Perl=ON
-        "-DCMAKE_C_FLAGS='-DNGHTTP3_STATICLIB -DNGHTTP2_STATICLIB -DNGTCP2_STATICLIB -lz -lbrotlienc -lbrotlidec -lbrotlicommon -lzstd -lcrypt32 -lsecur32'"
+        "-DCMAKE_C_FLAGS='-DNGHTTP3_STATICLIB -DNGHTTP2_STATICLIB -DNGTCP2_STATICLIB -lz -lbrotlienc -lbrotlidec -lbrotlicommon -lzstd -lcrypt32'"
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
