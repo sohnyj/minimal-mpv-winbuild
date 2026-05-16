@@ -50,7 +50,6 @@ ExternalProject_Add(openssl
         no-mdc2
         no-module
         no-ocsp
-        no-quic
         no-rc2
         no-rc4
         no-rc5
