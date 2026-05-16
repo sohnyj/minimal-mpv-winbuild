@@ -46,6 +46,7 @@ list(APPEND ep
     nghttp2
     nghttp3
     ngtcp2
+    curl
     mpv
     mpv-packaging
 )

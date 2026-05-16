@@ -1,13 +1,18 @@
 ExternalProject_Add(curl
     DEPENDS
+        brotli
+        nghttp2
+        nghttp3
+        ngtcp2
+        openssl
         zlib
         zstd
-        brotli
     GIT_REPOSITORY https://github.com/curl/curl.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--filter=tree:0"
+    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !docs"
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${EXEC} CONF=1 cmake -H<SOURCE_DIR> -B<BINARY_DIR>
+    CONFIGURE_COMMAND ${EXEC} cmake -H<SOURCE_DIR> -B<BINARY_DIR>
         -G Ninja
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}
@@ -18,8 +23,10 @@ ExternalProject_Add(curl
         -DBUILD_LIBCURL_DOCS=OFF
         -DBUILD_MISC_DOCS=OFF
         -DBUILD_SHARED_LIBS=OFF
+        -DBUILD_STATIC_LIBS=ON
         -DBUILD_TESTING=OFF
         -DCURL_BROTLI=ON
+        -DCURL_CA_NATIVE=ON
         -DCURL_DISABLE_AWS=ON
         -DCURL_DISABLE_DICT=ON
         -DCURL_DISABLE_FILE=ON
@@ -37,15 +44,27 @@ ExternalProject_Add(curl
         -DCURL_DISABLE_TFTP=ON
         -DCURL_DISABLE_WEBSOCKETS=ON
         -DCURL_USE_LIBPSL=OFF
+        -DCURL_USE_LIBSSH=OFF
         -DCURL_USE_LIBSSH2=OFF
-        -DCURL_USE_OPENSSL=OFF
-        -DCURL_USE_SCHANNEL=ON
+        -DCURL_USE_OPENSSL=ON
+        -DCURL_USE_PKGCONFIG=ON
+        -DCURL_USE_SCHANNEL=OFF
         -DCURL_ZLIB=ON
         -DCURL_ZSTD=ON
         -DENABLE_CURL_MANUAL=OFF
+        -DENABLE_THREADED_RESOLVER=ON
+        -DENABLE_UNICODE=ON
         -DPICKY_COMPILER=OFF
+        -DUSE_HTTPSRR=ON
         -DUSE_LIBIDN2=OFF
-        -DUSE_NGHTTP2=OFF
+        -DUSE_NGHTTP2=ON
+        -DUSE_NGHTTP3=ON
+        -DUSE_NGTCP2=ON
+        -DUSE_SSLS_EXPORT=ON
+        -DUSE_WIN32_IDN=ON
+        -DUSE_WINDOWS_SSPI=ON
+        -DCMAKE_DISABLE_FIND_PACKAGE_Perl=ON
+        "-DCMAKE_C_FLAGS='-DNGHTTP3_STATICLIB -DNGHTTP2_STATICLIB -DNGTCP2_STATICLIB -lz -lbrotlienc -lbrotlidec -lbrotlicommon -lzstd -lcrypt32 -lsecur32'"
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
