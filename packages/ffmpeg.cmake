@@ -32,6 +32,7 @@ ExternalProject_Add(ffmpeg
         --pkg-config-flags=--static
         --enable-amf
         --enable-cross-compile
+        --enable-cuda-llvm
         --enable-gpl
         --enable-lcms2
         --enable-libass
