@@ -24,6 +24,7 @@ ExternalProject_Add(mpv
         --prefix=${MINGW_INSTALL_PREFIX}
         --libdir=${MINGW_INSTALL_PREFIX}/lib
         --cross-file=${MESON_CROSS}
+        --buildtype=release
         --default-library=shared
         --prefer-static
         -Doptimization=3
