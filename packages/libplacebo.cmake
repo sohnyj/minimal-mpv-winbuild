@@ -24,6 +24,7 @@ ExternalProject_Add(libplacebo
         --libdir=${MINGW_INSTALL_PREFIX}/lib
         --cross-file=${MESON_CROSS}
         --default-library=static
+        --buildtype=release
         -Doptimization=3
         -Dd3d11=enabled
         -Dvulkan-registry='${MINGW_INSTALL_PREFIX}/share/vulkan/registry/vk.xml'
