@@ -60,6 +60,7 @@ ExternalProject_Add(ffmpeg
         --disable-indev=dshow
         --disable-indev=gdigrab
         --disable-indev=vfwcap
+        --disable-libmfx
         --disable-outdevs
         --disable-sdl2
         --disable-vaapi
