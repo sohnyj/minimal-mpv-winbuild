@@ -18,7 +18,7 @@ Autobuild runs daily at UTC 00:00.
 - **Image** — libjxl (and highway)
 - **Subtitle** — libaribcaption, libzvbi
 - **Disc playback** — libdvdcss, libdvdread, libdvdnav
-- **Network** — curl, libssh, libsrt, megasdk (with cryptopp, libsodium, libuv, sqlite, readline, termcap)
+- **Network** — libssh, libsrt, megasdk (with cryptopp, libsodium, libuv, sqlite, readline, termcap)
 - **Graphics** — ANGLE headers
 - **Hardware acceleration** — libmfx, libva
 - **Scripting** — mujs
@@ -45,7 +45,7 @@ GCC toolchain support is also removed; only Clang/LLD is supported.
 ## Setup Build Environment
 ### Ubuntu Linux / WSL (Windows 10)
 
-    apt-get install build-essential git ninja-build cmake automake pkgconf libtool libtool-bin clang llvm lld libc++1 libc++abi1 libgmp-dev libmpfr-dev libmpc-dev libgcrypt-dev python3-pip unzip p7zip-full curl ccache gettext nasm
+    apt-get install build-essential git ninja-build cmake automake pkgconf libtool libtool-bin clang llvm lld libc++1 libc++abi1 libgmp-dev libmpfr-dev libmpc-dev libgcrypt-dev libmimalloc-dev python3-pip unzip p7zip-full curl ccache gettext nasm
 
     pip3 install --break-system-packages meson mako jsonschema
 
@@ -103,6 +103,7 @@ After that, build mpv as usual:
     - amf-headers
     - brotli
     - bzip2
+    - curl (with libpsl, nghttp2, nghttp3, ngtcp2)
     - dav1d
     - FFmpeg
     - fontconfig
