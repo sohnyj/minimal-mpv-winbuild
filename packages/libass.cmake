@@ -16,15 +16,16 @@ ExternalProject_Add(libass
         --cross-file=${MESON_CROSS}
         --buildtype=release
         --default-library=static
-        -Dfontconfig=enabled
-        -Ddirectwrite=enabled
         -Dasm=enabled
-        -Dlibunibreak=enabled
-        -Dtest=disabled
-        -Dcompare=disabled
-        -Dprofile=disabled
-        -Dfuzz=disabled
         -Dcheckasm=disabled
+        -Dcompare=disabled
+        -Dcoretext=disabled
+        -Ddirectwrite=enabled
+        -Dfontconfig=enabled
+        -Dfuzz=disabled
+        -Dlibunibreak=enabled
+        -Dprofile=disabled
+        -Dtest=disabled
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
