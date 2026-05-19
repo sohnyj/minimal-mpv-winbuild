@@ -23,7 +23,7 @@ Autobuild runs daily at UTC 00:00.
 - **Hardware acceleration** — libmfx, libva
 - **Scripting** — mujs
 - **Input** — libsdl2
-- **Compression** — xz (LZMA), lzo
+- **Compression** — lzo
 - **Misc** — libsixel
 
 GCC toolchain support is also removed; only Clang/LLD is supported.
@@ -133,6 +133,7 @@ After that, build mpv as usual:
     - uchardet
     - vulkan
     - vulkan-header
+    - xz
     - zlib (zlib-ng)
     - zstd
 
