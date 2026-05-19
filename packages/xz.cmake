@@ -6,12 +6,17 @@ ExternalProject_Add(xz
     CONFIGURE_COMMAND ${EXEC} CONF=1 autoreconf -fi && <SOURCE_DIR>/configure
         --host=${TARGET_ARCH}
         --prefix=${MINGW_INSTALL_PREFIX}
+        --enable-checks=crc32,crc64
+        --enable-small
+        --disable-doc
+        --disable-lzmadec
+        --disable-lzmainfo
+        --disable-microlzma
+        --disable-nls
+        --disable-scripts
         --disable-shared
         --disable-xz
         --disable-xzdec
-        --disable-lzmadec
-        --disable-lzmainfo
-        --disable-doc
     BUILD_COMMAND ${MAKE}
     INSTALL_COMMAND ${MAKE} install
     BUILD_IN_SOURCE 1
