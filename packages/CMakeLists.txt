@@ -41,6 +41,7 @@ list(APPEND ep
     vulkan
     shaderc
     libplacebo
+    xz
     libarchive
     ffmpeg
     libpsl

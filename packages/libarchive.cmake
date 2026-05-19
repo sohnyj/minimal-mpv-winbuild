@@ -3,6 +3,7 @@ ExternalProject_Add(libarchive
         bzip2
         zlib
         zstd
+        xz
         openssl
         libxml2
     GIT_REPOSITORY https://github.com/libarchive/libarchive.git
@@ -25,7 +26,7 @@ ExternalProject_Add(libarchive
         -DENABLE_LIBXML2=ON
         -DENABLE_EXPAT=OFF
         -DENABLE_LZO=OFF
-        -DENABLE_LZMA=OFF
+        -DENABLE_LZMA=ON
         -DENABLE_CPIO=OFF
         -DENABLE_CAT=OFF
         -DENABLE_TAR=OFF
