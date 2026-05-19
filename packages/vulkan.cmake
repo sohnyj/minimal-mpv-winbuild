@@ -14,13 +14,11 @@ ExternalProject_Add(vulkan
         -DCMAKE_INSTALL_PREFIX=${MINGW_INSTALL_PREFIX}
         -DCMAKE_FIND_ROOT_PATH=${MINGW_INSTALL_PREFIX}
         -DBUILD_SHARED_LIBS=OFF
-        -DVULKAN_HEADERS_INSTALL_DIR=${MINGW_INSTALL_PREFIX}
-        -DBUILD_TESTS=OFF
-        -DENABLE_WERROR=OFF
-        ${vulkan_asm}
         -DBUILD_STATIC_LOADER=ON
+        -DBUILD_TESTS=OFF
+        -DVULKAN_HEADERS_INSTALL_DIR=${MINGW_INSTALL_PREFIX}
+        ${vulkan_asm}
         -DCMAKE_C_FLAGS='${CMAKE_C_FLAGS} -D__STDC_FORMAT_MACROS -DSTRSAFE_NO_DEPRECATE -Dparse_number=cjson_parse_number'
-        -DCMAKE_CXX_FLAGS='${CMAKE_CXX_FLAGS} -D__STDC_FORMAT_MACROS -fpermissive'
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/loader/libvulkan.a ${MINGW_INSTALL_PREFIX}/lib/libvulkan.a
             COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/loader/vulkan_own.pc ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/vulkan.pc
