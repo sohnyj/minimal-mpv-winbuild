@@ -15,11 +15,13 @@ ExternalProject_Add(freetype2
         --buildtype=release
         --default-library=static
         -Dbrotli=enabled
-        -Dpng=enabled
-        -Dzlib=enabled
         -Dbzip2=disabled
         -Dharfbuzz=disabled
+        -Dhvf=disabled
+        -Dmmap=enabled
+        -Dpng=enabled
         -Dtests=disabled
+        -Dzlib=enabled
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
