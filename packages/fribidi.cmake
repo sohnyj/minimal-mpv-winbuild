@@ -10,7 +10,6 @@ ExternalProject_Add(fribidi
         --cross-file=${MESON_CROSS}
         --buildtype=release
         --default-library=static
-        -Dcpp_args='-DFRIBIDI_LIB_STATIC'
         -Dbin=false
         -Ddeprecated=false
         -Ddocs=false
