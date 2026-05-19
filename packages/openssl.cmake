@@ -26,6 +26,7 @@ ExternalProject_Add(openssl
         no-aria
         no-async
         no-bf
+        no-blake2
         no-camellia
         no-cast
         no-cmac
@@ -49,10 +50,12 @@ ExternalProject_Add(openssl
         no-md4
         no-mdc2
         no-module
+        no-nextprotoneg
         no-ocsp
         no-rc2
         no-rc4
         no-rc5
+        no-rfc3779
         no-rmd160
         no-seed
         no-shared
@@ -61,8 +64,11 @@ ExternalProject_Add(openssl
         no-sm3
         no-sm4
         no-srp
+        no-ssl-trace
         no-tests
+        no-trace
         no-ts
+        no-uplink
         no-whirlpool
         no-autoload-config
     BUILD_COMMAND ${MAKE} build_sw
