@@ -2,14 +2,16 @@ ExternalProject_Add(mpv
     DEPENDS
         curl
         ffmpeg
+        fontconfig
         fribidi
         lcms2
         libarchive
         libass
+        libbluray
         libiconv
         libjpeg
         libplacebo
-        libpng
+        libzimg
         luajit
         shaderc
         spirv-cross
@@ -30,22 +32,44 @@ ExternalProject_Add(mpv
         -Doptimization=3
         -Db_lto=true
         ${mpv_lto_mode}
+        -Damf=enabled
+        -Dcuda-hwaccel=enabled
+        -Dcuda-interop=enabled
+        -Dd3d-hwaccel=enabled
+        -Dd3d11=enabled
+        -Diconv=enabled
+        -Djpeg=enabled
         -Dlcms2=enabled
         -Dlibarchive=enabled
+        -Dlibavdevice=enabled
         -Dlibbluray=enabled
         -Dlibcurl=enabled
-        -Dlua=enabled
+        -Dlua=luajit
+        -Dshaderc=enabled
         -Dspirv-cross=enabled
         -Dsubrandr=enabled
         -Duchardet=enabled
         -Dvulkan=enabled
+        -Dwasapi=enabled
+        -Dwin32-smtc=enabled
+        -Dzimg=enabled
+        -Dzlib=enabled
+        -Dcdda=disabled
         -Dcplugins=disabled
         -Dd3d9-hwaccel=disabled
         -Ddirect3d=disabled
+        -Ddvbin=disabled
+        -Ddvdnav=disabled
+        -Dfuzzers=false
         -Dgl=disabled
+        -Dhtml-build=disabled
         -Djavascript=disabled
         -Dlibmpv=false
+        -Dmanpage-build=disabled
+        -Dpdf-build=disabled
         -Drubberband=disabled
+        -Dtests=false
+        -Dvapoursynth=disabled
         -Dc_args='-Wno-error=int-conversion'
     BUILD_COMMAND ${EXEC} LTO_JOB=1 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ""
