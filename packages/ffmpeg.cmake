@@ -1,24 +1,28 @@
 ExternalProject_Add(ffmpeg
     DEPENDS
         amf-headers
-        spirv-headers
-        nvcodec-headers
         bzip2
+        dav1d
+        fontconfig
+        freetype2
+        fribidi
+        harfbuzz
         lcms2
-        openssl
         libass
         libbluray
-        libpng
+        libiconv
+        libplacebo
         libsoxr
         libvpl
         libwebp
-        libzimg
-        fontconfig
-        harfbuzz
         libxml2
+        libzimg
+        nvcodec-headers
+        openssl
         shaderc
-        libplacebo
-        dav1d
+        spirv-headers
+        xz
+        zlib
     GIT_REPOSITORY https://github.com/FFmpeg/FFmpeg.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--sparse --filter=tree:0"
@@ -31,9 +35,14 @@ ExternalProject_Add(ffmpeg
         --target-os=mingw32
         --pkg-config-flags=--static
         --enable-amf
+        --enable-bzlib
         --enable-cross-compile
         --enable-cuda-llvm
+        --enable-d3d11va
+        --enable-d3d12va
+        --enable-ffnvcodec
         --enable-gpl
+        --enable-iconv
         --enable-lcms2
         --enable-libass
         --enable-libbluray
@@ -49,9 +58,14 @@ ExternalProject_Add(ffmpeg
         --enable-libwebp
         --enable-libxml2
         --enable-libzimg
+        --enable-lzma
+        --enable-nvdec
+        --enable-nvenc
         --enable-openssl
         --enable-runtime-cpudetect
         --enable-version3
+        --enable-vulkan
+        --enable-zlib
         --disable-cuvid
         --disable-debug
         --disable-doc
@@ -62,6 +76,7 @@ ExternalProject_Add(ffmpeg
         --disable-indev=gdigrab
         --disable-indev=vfwcap
         --disable-libmfx
+        --disable-mediafoundation
         --disable-outdevs
         --disable-sdl2
         --disable-vaapi
