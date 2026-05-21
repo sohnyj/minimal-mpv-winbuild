@@ -72,7 +72,6 @@ ExternalProject_Add(ffmpeg
         --disable-dxva2
         --disable-ffplay
         --disable-ffprobe
-        --disable-indev=dshow
         --disable-indev=gdigrab
         --disable-indev=vfwcap
         --disable-libmfx
