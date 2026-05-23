@@ -65,6 +65,7 @@ ExternalProject_Add(curl
         -DENABLE_THREADED_RESOLVER=ON
         -DENABLE_UNICODE=ON
         -DPICKY_COMPILER=OFF
+        -DUSE_ECH=ON
         -DUSE_HTTPSRR=ON
         -DUSE_LIBIDN2=OFF
         -DUSE_NGHTTP2=ON
