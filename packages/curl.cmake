@@ -71,6 +71,7 @@ ExternalProject_Add(curl
         -DUSE_NGHTTP2=ON
         -DUSE_NGHTTP3=ON
         -DUSE_NGTCP2=ON
+        -DUSE_PROXY_HTTP3=ON
         -DUSE_SSLS_EXPORT=ON
         -DUSE_WIN32_IDN=ON
         -DCMAKE_DISABLE_FIND_PACKAGE_Perl=ON
