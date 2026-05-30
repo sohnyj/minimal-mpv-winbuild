@@ -21,8 +21,6 @@ jobs:
       mpv_shorthead: ${{ steps.source_revisions.outputs.mpv }}
       ffmpeg_shorthead: ${{ steps.source_revisions.outputs.ffmpeg }}
       libplacebo_shorthead: ${{ steps.source_revisions.outputs.libplacebo }}
-      llvm_shorthead: ${{ steps.source_revisions.outputs.llvm }}
-      llvm_version: ${{ steps.source_revisions.outputs.llvm_version }}
     strategy:
       fail-fast: false
       matrix:
@@ -112,16 +110,9 @@ jobs:
           mpv_hash=$(git -C src_packages/mpv rev-parse --short HEAD)
           ffmpeg_hash=$(git -C src_packages/ffmpeg rev-parse --short HEAD)
           libplacebo_hash=$(git -C src_packages/libplacebo rev-parse --short HEAD)
-          llvm_hash=$(git -C src_packages/llvm rev-parse --short HEAD)
-          llvm_version_file=$(git -C src_packages/llvm show HEAD:cmake/Modules/LLVMVersion.cmake)
-          llvm_major=$(printf '%s\n' "$llvm_version_file" | sed -nE 's/^[[:space:]]*set\(LLVM_VERSION_MAJOR ([0-9]+).*/\1/p')
-          llvm_minor=$(printf '%s\n' "$llvm_version_file" | sed -nE 's/^[[:space:]]*set\(LLVM_VERSION_MINOR ([0-9]+).*/\1/p')
-          llvm_patch=$(printf '%s\n' "$llvm_version_file" | sed -nE 's/^[[:space:]]*set\(LLVM_VERSION_PATCH ([0-9]+).*/\1/p')
           echo "mpv=$mpv_hash" >> $GITHUB_OUTPUT
           echo "ffmpeg=$ffmpeg_hash" >> $GITHUB_OUTPUT
           echo "libplacebo=$libplacebo_hash" >> $GITHUB_OUTPUT
-          echo "llvm=$llvm_hash" >> $GITHUB_OUTPUT
-          echo "llvm_version=$llvm_major.$llvm_minor.$llvm_patch" >> $GITHUB_OUTPUT
 
       - name: Copying ffmpeg
         run: |
@@ -239,7 +230,6 @@ jobs:
           **mpv commit**: [${{ needs.build_mpv.outputs.mpv_shorthead }}](https://github.com/mpv-player/mpv/commit/${{ needs.build_mpv.outputs.mpv_shorthead }})
           **ffmpeg commit**: [${{ needs.build_mpv.outputs.ffmpeg_shorthead }}](https://github.com/FFmpeg/FFmpeg/commit/${{ needs.build_mpv.outputs.ffmpeg_shorthead }})
           **libplacebo commit**: [${{ needs.build_mpv.outputs.libplacebo_shorthead }}](https://github.com/haasn/libplacebo/commit/${{ needs.build_mpv.outputs.libplacebo_shorthead }})
-          **LLVM/clang**: ${{ needs.build_mpv.outputs.llvm_version }} ([${{ needs.build_mpv.outputs.llvm_shorthead }}](https://github.com/llvm/llvm-project/commit/${{ needs.build_mpv.outputs.llvm_shorthead }}))
           **Workflow run**: [$GITHUB_RUN_ID]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
           END
           )
