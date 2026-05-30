@@ -113,10 +113,10 @@ jobs:
           ffmpeg_hash=$(git -C src_packages/ffmpeg rev-parse --short HEAD)
           libplacebo_hash=$(git -C src_packages/libplacebo rev-parse --short HEAD)
           llvm_hash=$(git -C src_packages/llvm rev-parse --short HEAD)
-          llvm_cmake=src_packages/llvm/cmake/Modules/LLVMVersion.cmake
-          llvm_major=$(sed -nE 's/^[[:space:]]*set\(LLVM_VERSION_MAJOR ([0-9]+).*/\1/p' "$llvm_cmake")
-          llvm_minor=$(sed -nE 's/^[[:space:]]*set\(LLVM_VERSION_MINOR ([0-9]+).*/\1/p' "$llvm_cmake")
-          llvm_patch=$(sed -nE 's/^[[:space:]]*set\(LLVM_VERSION_PATCH ([0-9]+).*/\1/p' "$llvm_cmake")
+          llvm_version_file=$(git -C src_packages/llvm show HEAD:cmake/Modules/LLVMVersion.cmake)
+          llvm_major=$(printf '%s\n' "$llvm_version_file" | sed -nE 's/^[[:space:]]*set\(LLVM_VERSION_MAJOR ([0-9]+).*/\1/p')
+          llvm_minor=$(printf '%s\n' "$llvm_version_file" | sed -nE 's/^[[:space:]]*set\(LLVM_VERSION_MINOR ([0-9]+).*/\1/p')
+          llvm_patch=$(printf '%s\n' "$llvm_version_file" | sed -nE 's/^[[:space:]]*set\(LLVM_VERSION_PATCH ([0-9]+).*/\1/p')
           echo "mpv=$mpv_hash" >> $GITHUB_OUTPUT
           echo "ffmpeg=$ffmpeg_hash" >> $GITHUB_OUTPUT
           echo "libplacebo=$libplacebo_hash" >> $GITHUB_OUTPUT
