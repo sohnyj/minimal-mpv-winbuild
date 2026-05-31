@@ -27,8 +27,10 @@ jobs:
         include:
           - llvm_arch: x86-64-v3
             x86_64_level: v3
+            clang_flags: ""
           - llvm_arch: znver3
             x86_64_level: znver3
+            clang_flags: "-mtune=znver3"
     env:
       BIT: x86_64
       BUILD_DIR: build_x86_64-${{ matrix.x86_64_level }}
@@ -91,7 +93,7 @@ jobs:
 
       - name: Configuring CMake & Downloading source
         run: |
-          cmake -DTARGET_ARCH=$BIT-w64-mingw32 -DCOMPILER_TOOLCHAIN=clang -DLLVM_ARCH=${{ matrix.llvm_arch }} -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/$BUILD_DIR/$BIT-${{ matrix.x86_64_level }}-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -DENABLE_CCACHE=ON -DCLANG_PACKAGES_LTO=ON -G Ninja --fresh -B $BUILD_DIR -S $PWD
+          cmake -DTARGET_ARCH=$BIT-w64-mingw32 -DCOMPILER_TOOLCHAIN=clang -DLLVM_ARCH=${{ matrix.llvm_arch }} -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/$BUILD_DIR/$BIT-${{ matrix.x86_64_level }}-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -DENABLE_CCACHE=ON -DCLANG_PACKAGES_LTO=ON -DCLANG_FLAGS="${{ matrix.clang_flags }}" -G Ninja --fresh -B $BUILD_DIR -S $PWD
           ninja -C $BUILD_DIR download || true
 
       - name: Building mpv
