@@ -73,7 +73,6 @@ ExternalProject_Add(ffmpeg
         --disable-ffprobe
         --disable-indev=gdigrab
         --disable-indev=vfwcap
-        --disable-libmfx
         --disable-mediafoundation
         --disable-outdevs
         --disable-sdl2
