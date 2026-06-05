@@ -189,8 +189,8 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       CURL_RETRIES: "--connect-timeout 60 --retry 999 --retry-delay 5 --retry-all-errors"
-      release_v3_key: release_v3-${{ needs.build_mpv.outputs.cache_version }}-${{ github.run_id }}
-      release_znver3_key: release_znver3-${{ needs.build_mpv.outputs.cache_version }}-${{ github.run_id }}
+      RELEASE_V3_KEY: release_v3-${{ needs.build_mpv.outputs.cache_version }}-${{ github.run_id }}
+      RELEASE_ZNVER3_KEY: release_znver3-${{ needs.build_mpv.outputs.cache_version }}-${{ github.run_id }}
     steps:
       - name: Installing dependencies
         run: |
@@ -206,13 +206,13 @@ jobs:
         uses: actions/cache/restore@main
         with:
           path: release_v3
-          key: ${{ env.release_v3_key }}
+          key: ${{ env.RELEASE_V3_KEY }}
 
       - name: Loading release_x86_64-znver3 cache
         uses: actions/cache/restore@main
         with:
           path: release_znver3
-          key: ${{ env.release_znver3_key }}
+          key: ${{ env.RELEASE_ZNVER3_KEY }}
 
       - name: Moving archives
         run: |
@@ -262,5 +262,5 @@ jobs:
       - name: Delete releases cache
         if: ${{ github.event.inputs.github_release == 'false' || steps.upload_packages_gh.outcome == 'success' }}
         run: |
-          curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES -s -o /dev/null -X DELETE -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/sohnyj/minimal-mpv-winbuild/actions/caches?key=$release_v3_key
-          curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES -s -o /dev/null -X DELETE -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/sohnyj/minimal-mpv-winbuild/actions/caches?key=$release_znver3_key
+          curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES -s -o /dev/null -X DELETE -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/sohnyj/minimal-mpv-winbuild/actions/caches?key=$RELEASE_V3_KEY
+          curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES -s -o /dev/null -X DELETE -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/sohnyj/minimal-mpv-winbuild/actions/caches?key=$RELEASE_ZNVER3_KEY
