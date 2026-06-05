@@ -58,17 +58,26 @@ jobs:
         id: cache_version
         run: echo "value=$(date -u +'%Y%m%d')" >> $GITHUB_OUTPUT
 
-      - name: Loading clang sysroot cache
+      - name: Loading clang toolchain cache
+        id: clang_root_cache
         uses: actions/cache/restore@main
         with:
           path: |
             clang_root
-          key: clang_root-${{ matrix.x86_64_level }}-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
+          key: clang_root-${{ steps.cache_version.outputs.value }}
           restore-keys: |
-            clang_root-${{ matrix.x86_64_level }}-${{ steps.cache_version.outputs.value }}
-            clang_root-${{ matrix.x86_64_level }}-
-            clang_root-${{ steps.cache_version.outputs.value }}
             clang_root-
+
+      - name: Deriving toolchain id from restored clang_root
+        id: toolchain_id
+        env:
+          MATCHED_KEY: ${{ steps.clang_root_cache.outputs.cache-matched-key }}
+        run: |
+          if [ -z "$MATCHED_KEY" ]; then
+            echo "::error::No clang_root cache found; run the llvm toolchain workflow first."
+            exit 1
+          fi
+          echo "value=${MATCHED_KEY#clang_root-}" >> $GITHUB_OUTPUT
 
       - name: Loading repository cache
         uses: actions/cache/restore@main
@@ -81,15 +90,14 @@ jobs:
             repository-${{ steps.cache_version.outputs.value }}
             repository-
 
-      - name: Loading ${{ matrix.x86_64_level }} toolchain cache
+      - name: Loading ${{ matrix.x86_64_level }} sysroot cache
         uses: actions/cache/restore@main
         with:
           path: |
             ${{ env.BUILD_DIR }}
-          key: clang-${{ matrix.x86_64_level }}_toolchain-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
+          key: sysroot-${{ steps.toolchain_id.outputs.value }}-${{ matrix.x86_64_level }}-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
           restore-keys: |
-            clang-${{ matrix.x86_64_level }}_toolchain-${{ steps.cache_version.outputs.value }}
-            clang-${{ matrix.x86_64_level }}_toolchain-
+            sysroot-${{ steps.toolchain_id.outputs.value }}-${{ matrix.x86_64_level }}-
 
       - name: Configuring CMake & Downloading source
         run: |
@@ -153,14 +161,6 @@ jobs:
         run: |
           ninja -C $BUILD_DIR cargo-clean
 
-      - name: Saving clang sysroot cache
-        uses: actions/cache/save@main
-        if: always()
-        with:
-          path: |
-            clang_root
-          key: clang_root-${{ matrix.x86_64_level }}-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
-
       - name: Saving repository cache
         uses: actions/cache/save@main
         if: always()
@@ -168,13 +168,13 @@ jobs:
           path: src_packages
           key: repository-${{ matrix.x86_64_level }}-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
 
-      - name: Saving ${{ matrix.x86_64_level }} toolchain cache
+      - name: Saving ${{ matrix.x86_64_level }} sysroot cache
         uses: actions/cache/save@main
         if: always()
         with:
           path: |
             ${{ env.BUILD_DIR }}
-          key: clang-${{ matrix.x86_64_level }}_toolchain-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
+          key: sysroot-${{ steps.toolchain_id.outputs.value }}-${{ matrix.x86_64_level }}-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
 
       - name: Saving release cache
         uses: actions/cache/save@main
