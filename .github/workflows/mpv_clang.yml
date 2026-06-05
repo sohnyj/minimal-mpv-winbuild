@@ -82,9 +82,7 @@ jobs:
           path: src_packages
           key: repository-${{ matrix.x86_64_level }}-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
           restore-keys: |
-            repository-${{ matrix.x86_64_level }}-${{ steps.cache_version.outputs.value }}
             repository-${{ matrix.x86_64_level }}-
-            repository-${{ steps.cache_version.outputs.value }}
             repository-
 
       - name: Loading ${{ matrix.x86_64_level }} sysroot cache
