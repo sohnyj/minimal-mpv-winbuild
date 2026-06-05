@@ -68,15 +68,12 @@ jobs:
           restore-keys: |
             clang_root-
 
-      - name: Deriving toolchain id from restored clang_root
+      - name: Deriving toolchain id
         id: toolchain_id
         env:
           MATCHED_KEY: ${{ steps.clang_root_cache.outputs.cache-matched-key }}
         run: |
-          if [ -z "$MATCHED_KEY" ]; then
-            echo "::error::No clang_root cache found; run the llvm toolchain workflow first."
-            exit 1
-          fi
+          test -n "$MATCHED_KEY" || exit 1
           echo "value=${MATCHED_KEY#clang_root-}" >> $GITHUB_OUTPUT
 
       - name: Loading repository cache
@@ -98,6 +95,7 @@ jobs:
           key: sysroot-${{ steps.toolchain_id.outputs.value }}-${{ matrix.x86_64_level }}-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
           restore-keys: |
             sysroot-${{ steps.toolchain_id.outputs.value }}-${{ matrix.x86_64_level }}-
+            clang-${{ matrix.x86_64_level }}_toolchain-${{ steps.toolchain_id.outputs.value }}
 
       - name: Configuring CMake & Downloading source
         run: |
