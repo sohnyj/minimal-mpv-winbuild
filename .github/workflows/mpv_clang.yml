@@ -90,7 +90,7 @@ jobs:
         with:
           path: |
             ${{ env.BUILD_DIR }}
-          key: sysroot-${{ steps.toolchain_id.outputs.value }}-${{ matrix.x86_64_level }}
+          key: sysroot-${{ matrix.x86_64_level }}-${{ steps.toolchain_id.outputs.value }}
           restore-keys: |
             clang-${{ matrix.x86_64_level }}_toolchain-${{ steps.toolchain_id.outputs.value }}
 
@@ -164,7 +164,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           CURL_RETRIES: "--connect-timeout 60 --retry 999 --retry-delay 5 --retry-all-errors"
           REPOSITORY_KEY: repository-${{ matrix.x86_64_level }}
-          SYSROOT_KEY: sysroot-${{ steps.toolchain_id.outputs.value }}-${{ matrix.x86_64_level }}
+          SYSROOT_KEY: sysroot-${{ matrix.x86_64_level }}-${{ steps.toolchain_id.outputs.value }}
         run: |
           for key in "$REPOSITORY_KEY" "$SYSROOT_KEY"; do
             curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES -s -o /dev/null -X DELETE -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/sohnyj/minimal-mpv-winbuild/actions/caches?key=$key"
@@ -183,7 +183,7 @@ jobs:
         with:
           path: |
             ${{ env.BUILD_DIR }}
-          key: sysroot-${{ steps.toolchain_id.outputs.value }}-${{ matrix.x86_64_level }}
+          key: sysroot-${{ matrix.x86_64_level }}-${{ steps.toolchain_id.outputs.value }}
 
       - name: Saving release cache
         uses: actions/cache/save@main
