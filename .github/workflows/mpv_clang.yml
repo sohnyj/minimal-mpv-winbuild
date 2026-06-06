@@ -81,9 +81,8 @@ jobs:
         uses: actions/cache/restore@main
         with:
           path: src_packages
-          key: repository-${{ matrix.x86_64_level }}-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
+          key: repository-${{ matrix.x86_64_level }}
           restore-keys: |
-            repository-${{ matrix.x86_64_level }}-
             repository-
 
       - name: Loading ${{ matrix.x86_64_level }} sysroot cache
@@ -91,9 +90,8 @@ jobs:
         with:
           path: |
             ${{ env.BUILD_DIR }}
-          key: sysroot-${{ steps.toolchain_id.outputs.value }}-${{ matrix.x86_64_level }}-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
+          key: sysroot-${{ steps.toolchain_id.outputs.value }}-${{ matrix.x86_64_level }}
           restore-keys: |
-            sysroot-${{ steps.toolchain_id.outputs.value }}-${{ matrix.x86_64_level }}-
             clang-${{ matrix.x86_64_level }}_toolchain-${{ steps.toolchain_id.outputs.value }}
 
       - name: Configuring CMake & Downloading source
@@ -160,12 +158,24 @@ jobs:
         run: |
           ninja -C $BUILD_DIR cargo-clean
 
+      - name: Deleting stale incremental caches
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CURL_RETRIES: "--connect-timeout 60 --retry 999 --retry-delay 5 --retry-all-errors"
+          REPOSITORY_KEY: repository-${{ matrix.x86_64_level }}
+          SYSROOT_KEY: sysroot-${{ steps.toolchain_id.outputs.value }}-${{ matrix.x86_64_level }}
+        run: |
+          for key in "$REPOSITORY_KEY" "$SYSROOT_KEY"; do
+            curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES -s -o /dev/null -X DELETE -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/sohnyj/minimal-mpv-winbuild/actions/caches?key=$key"
+          done
+
       - name: Saving repository cache
         uses: actions/cache/save@main
         if: always()
         with:
           path: src_packages
-          key: repository-${{ matrix.x86_64_level }}-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
+          key: repository-${{ matrix.x86_64_level }}
 
       - name: Saving ${{ matrix.x86_64_level }} sysroot cache
         uses: actions/cache/save@main
@@ -173,7 +183,7 @@ jobs:
         with:
           path: |
             ${{ env.BUILD_DIR }}
-          key: sysroot-${{ steps.toolchain_id.outputs.value }}-${{ matrix.x86_64_level }}-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
+          key: sysroot-${{ steps.toolchain_id.outputs.value }}-${{ matrix.x86_64_level }}
 
       - name: Saving release cache
         uses: actions/cache/save@main
