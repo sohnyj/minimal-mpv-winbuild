@@ -1,12 +1,10 @@
 set_property(DIRECTORY PROPERTY EP_STEP_TARGETS download)
 include(${PROJECT_SOURCE_DIR}/cmake/toolchain_check.cmake)
 list(APPEND ep
-    gcc-binutils
     ${llvm_wrapper}
     mingw-w64
     mingw-w64-headers
     cppwinrt
-    gcc
     mingw-w64-crt
     gendef
     widl
@@ -15,7 +13,6 @@ list(APPEND ep
     llvm-compiler-rt-builtin
     llvm-libcxx
     llvm-compiler-rt
-    llvm-openmp
     winpthreads
     llvm-clang
 )

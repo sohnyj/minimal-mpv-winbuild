@@ -45,7 +45,7 @@ GCC toolchain support is also removed; only Clang/LLD is supported.
 ## Setup Build Environment
 ### Ubuntu Linux / WSL (Windows 10)
 
-    apt-get install build-essential git ninja-build cmake automake pkgconf libtool libtool-bin clang llvm lld libc++1 libc++abi1 libc++-dev libc++abi-dev libgmp-dev libmpfr-dev libmpc-dev libgcrypt-dev libmimalloc-dev python3-pip unzip p7zip-full curl ccache gettext autopoint nasm
+    apt-get install build-essential git ninja-build cmake automake pkgconf libtool libtool-bin clang llvm lld libc++1 libc++abi1 libc++-dev libc++abi-dev libgmp-dev libmpfr-dev libmpc-dev libgcrypt-dev libmimalloc-dev python3-pip unzip p7zip-full curl ccache gettext autopoint nasm glslang-tools
 
     pip3 install --break-system-packages meson mako jsonschema
 
