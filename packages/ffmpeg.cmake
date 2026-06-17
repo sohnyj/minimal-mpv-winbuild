@@ -81,7 +81,6 @@ ExternalProject_Add(ffmpeg
         --disable-protocol=ffrtmpcrypt
         --disable-protocol=ffrtmphttp
         --disable-protocol=ftp
-        --disable-protocol=ftps
         --disable-protocol=gopher
         --disable-protocol=gophers
         --disable-protocol=icecast
