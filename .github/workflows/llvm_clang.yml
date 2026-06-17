@@ -195,6 +195,19 @@ jobs:
           path: build_x86_64-znver3
           key: clang-znver3_toolchain-${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
 
+      - name: Deleting superseded toolchain caches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          KEEP: ${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
+        run: |
+          for prefix in clang_root- clang-x86_64_toolchain- clang-v3_toolchain- clang-znver3_toolchain-; do
+            for key in $(gh cache list --repo "$REPO" --key "$prefix" --json key --limit 100 --jq '.[].key'); do
+              [ "$key" = "${prefix}${KEEP}" ] && continue
+              gh cache delete "$key" --repo "$REPO" || true
+            done
+          done
+
   call_workflow:
     name: Run mpv_clang
     runs-on: ubuntu-latest
