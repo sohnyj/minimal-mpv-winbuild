@@ -78,6 +78,25 @@ ExternalProject_Add(ffmpeg
         --disable-sdl2
         --disable-vaapi
         --disable-vdpau
+        --disable-protocol=ffrtmpcrypt
+        --disable-protocol=ffrtmphttp
+        --disable-protocol=ftp
+        --disable-protocol=ftps
+        --disable-protocol=gopher
+        --disable-protocol=gophers
+        --disable-protocol=icecast
+        --disable-protocol=md5
+        --disable-protocol=mmsh
+        --disable-protocol=mmst
+        --disable-protocol=prompeg
+        --disable-protocol=rtmp
+        --disable-protocol=rtmpe
+        --disable-protocol=rtmps
+        --disable-protocol=rtmpt
+        --disable-protocol=rtmpte
+        --disable-protocol=rtmpts
+        --disable-protocol=tee
+        --disable-protocol=udplite
         ${ffmpeg_lto}
         --extra-cflags='-Wno-error=int-conversion'
         "--extra-libs='${ffmpeg_extra_libs}'" # -lstdc++ / -lc++ needs by shaderc
