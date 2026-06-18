@@ -78,8 +78,6 @@ ExternalProject_Add(ffmpeg
         --disable-sdl2
         --disable-vaapi
         --disable-vdpau
-        --disable-protocol=ffrtmpcrypt
-        --disable-protocol=ffrtmphttp
         --disable-protocol=ftp
         --disable-protocol=gopher
         --disable-protocol=gophers
@@ -88,12 +86,6 @@ ExternalProject_Add(ffmpeg
         --disable-protocol=mmsh
         --disable-protocol=mmst
         --disable-protocol=prompeg
-        --disable-protocol=rtmp
-        --disable-protocol=rtmpe
-        --disable-protocol=rtmps
-        --disable-protocol=rtmpt
-        --disable-protocol=rtmpte
-        --disable-protocol=rtmpts
         --disable-protocol=tee
         --disable-protocol=udplite
         ${ffmpeg_lto}
