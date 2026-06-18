@@ -78,7 +78,6 @@ ExternalProject_Add(ffmpeg
         --disable-sdl2
         --disable-vaapi
         --disable-vdpau
-        --disable-protocol=ftp
         --disable-protocol=gopher
         --disable-protocol=gophers
         --disable-protocol=icecast
