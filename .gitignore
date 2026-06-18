@@ -8,3 +8,4 @@
 /clang_root
 /install_rustup
 /src_packages
+/llvm.profdata

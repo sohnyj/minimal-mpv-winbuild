@@ -1,7 +1,7 @@
 # CMake-based MinGW-w64 Cross Toolchain
 
 This fork is tailored for typical playback scenarios, removing video/audio encoding libraries, legacy formats, specialized formats, and rare protocol support.
-Encoding libraries are only needed for encoding/transcoding, not playback — **FFmpeg's built-in decoders cover all common formats.**
+Encoding libraries are only needed for encoding/transcoding, not playback.
 Image encoding is limited to jpg, webp, and png via libjpeg, libwebp, and libpng.
 
 Only Vulkan and Direct3D 11+ are supported for GPU acceleration, with nvidia(nvcodec-headers), amd(amf-headers), and intel(libvpl).
@@ -49,21 +49,39 @@ GCC toolchain support is also removed; only Clang/LLD is supported.
 
     pip3 install --break-system-packages meson mako jsonschema
 
-## Compiling with Clang
+## Build scripts
+
+The `scripts/` directory automates the manual toolchain and mpv builds described below.
+
+| Script | Purpose |
+| ------ | ------- |
+| `scripts/build-llvm.sh` | Build the LLVM/Clang + Rust toolchain from scratch (PGO), fast-forwarding the toolchain sources (llvm, mingw-w64, cppwinrt) to their latest tip first. Run before `build-mpv.sh`. |
+| `scripts/build-mpv.sh` | Build and package mpv + ffmpeg against that toolchain into `./release`. Pulls package sources to their latest tip (`ninja update`) on every run. |
+| `scripts/update-repo.sh` | Fast-forward package sources and invalidate stamps (`ninja update`) in every configured build dir, without building. |
+
+    scripts/build-llvm.sh                                # toolchain (default: x86-64-v3)
+    scripts/build-mpv.sh                                 # mpv + ffmpeg -> ./release
+
+    scripts/build-llvm.sh --march znver3                 # other arch
+    scripts/build-mpv.sh  --march znver3 --mtune znver3
+
+Each takes an optional trailing `buildroot` (the directory holding `clang_root`/`src_packages`/`build_*`), defaulting to the repository root.
+
+## Toolchain & mpv build
 
 Example:
 
     cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
-    -DCMAKE_INSTALL_PREFIX="/home/USER/clang_root" \
+    -DCMAKE_INSTALL_PREFIX="/home/USER/minimal-mpv-winbuild/clang_root" \
     -DLLVM_ARCH=x86-64-v3 \
-    -DSINGLE_SOURCE_LOCATION="/home/USER/packages" \
-    -DRUSTUP_LOCATION="/home/USER/install_rustup" \
-    -DMINGW_INSTALL_PREFIX="/home/USER/build_x86_64-v3/x86_64-v3-w64-mingw32" \
-    -G Ninja -B build_x86_64-v3 -S minimal-mpv-winbuild
+    -DSINGLE_SOURCE_LOCATION="/home/USER/minimal-mpv-winbuild/src_packages" \
+    -DRUSTUP_LOCATION="/home/USER/minimal-mpv-winbuild/install_rustup" \
+    -DMINGW_INSTALL_PREFIX="/home/USER/minimal-mpv-winbuild/build_x86_64-v3/x86_64-v3-w64-mingw32" \
+    -G Ninja -B minimal-mpv-winbuild/build_x86_64-v3 -S minimal-mpv-winbuild
 
 The cmake command will create `clang_root` as clang sysroot where LLVM tools are installed. `build_x86_64-v3` is the build directory for compiling packages.
 
-    cd build_x86_64-v3
+    cd minimal-mpv-winbuild/build_x86_64-v3
     ninja llvm       # build LLVM (takes ~2 hours)
     ninja rustup     # build rust toolchain
     ninja llvm-clang # build clang on specified target
@@ -71,7 +89,7 @@ The cmake command will create `clang_root` as clang sysroot where LLVM tools are
 
 `-DLLVM_ARCH=x86-64-v3` will set the `-march` option to `x86-64-v3` instructions. Other values like `native`, `znver3` should work too.
 
-## Building Software (Second Time)
+## Incremental mpv build
 
 To build mpv for a second time:
 

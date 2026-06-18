@@ -1,37 +1,40 @@
 #!/bin/bash
+# Refresh git-based package sources and invalidate stamps by running `ninja
+# update` in every configured build_x86_64* dir under buildroot. Standalone
+# helper for manually syncing sources between builds.
+#
+# Usage: update-repo.sh [buildroot]
+#   buildroot  location of the build_x86_64* dirs
+#              (default: the repository root)
+set -uo pipefail
 
-main() {
-    packages_dir=$(pwd)
-    for dir in $packages_dir/*-prefix ; do
-        local name=$(echo $(basename $dir) | sed -e 's|-prefix$||')
-        [[ ! -z $1 ]] && local src_dir=$1/$name || local src_dir=$packages_dir/$name-prefix/src/$name
-        [[ ! -z $2 ]] && local stamp_dir=$2/packages/$name-prefix/src/$name-stamp || local stamp_dir=$packages_dir/$name-prefix/src/$name-stamp
+usage() { sed -n '2,${/^#/!q;s/^# \?//p}' "$0"; exit "${1:-0}"; }
 
-        if [[ -d "$src_dir/.git" ]] ; then
-            gitupdate $name $src_dir $stamp_dir &
-        fi
-    done
-    wait
-}
+gitdir=$(cd "$(dirname "$(realpath "$0")")/.." && pwd)
 
-gitupdate()
-{
-    local name=$1
-    local src_dir=$2
-    local stamp_dir=$3
+buildroot=""
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h|--help) usage 0 ;;
+        -*)        echo "unknown option: $1" >&2; usage 1 ;;
+        *)         buildroot="$1"; shift ;;
+    esac
+done
+[[ -n "$buildroot" ]] || buildroot="$gitdir"
+buildroot=$(cd "$buildroot" && pwd)
 
-    echo "Updating $name"
-    git -C $src_dir reset --hard @{u} > /dev/null
+shopt -s nullglob
+rc=0
+found=0
+for dir in "$buildroot"/build_x86_64*; do
+    [[ -f "$dir/build.ninja" ]] || continue
+    found=1
+    echo ">> Updating $(basename "$dir")"
+    ninja -C "$dir" update || rc=1
+done
 
-    result=$(git -C $src_dir pull 2>&1)
-    result_module=$(git -C $src_dir submodule update --remote --recursive 2>&1)
-
-    if [[ ! "$result" =~ up[-\ ]to[-\ ]date ]] || [[ ! -z $result_module ]]; then
-        echo "Deleting stamp files for $name"
-        find $stamp_dir -maxdepth 1 -type f ! -iname "*.cmake" -size 0c -delete
-    fi
-}
-
-# Execute
-# ex: ./update-repo.sh /home/git_source /home/build_x86_64_v3
-main $1 $2
+if [[ $found -eq 0 ]]; then
+    echo "No configured build_x86_64* dir under $buildroot (configure a build first)" >&2
+    exit 1
+fi
+exit $rc
