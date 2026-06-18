@@ -75,7 +75,7 @@ refresh_sources() { # $1 = build dir exposing the <repo>-force-update targets
     fi
 }
 
-echo ">> [1/6] LLVM + Rust with PGO instrumentation (build_x86_64)"
+echo ">> [1/6] Build LLVM with PGO"
 cmake "${common[@]}" -DLLVM_ENABLE_PGO=GEN \
     -DMINGW_INSTALL_PREFIX="$host_dir/x86_64-w64-mingw32" -B "$host_dir"
 refresh_sources "$host_dir"
@@ -83,11 +83,11 @@ ninja -C "$host_dir" llvm
 ninja -C "$host_dir" rustup
 ninja -C "$host_dir" cargo-clean
 
-echo ">> [2/6] Base x86_64 cross toolchain (PGO instrumentation)"
+echo ">> [2/6] Build x86_64 cross toolchain"
 ninja -C "$host_dir" llvm-clang
 
 if [[ -n "$suffix" ]]; then
-    echo ">> [3/6] $march cross toolchain (build_x86_64$suffix)"
+    echo ">> [3/6] $march cross toolchain"
     cmake "${common[@]}" -DLLVM_ARCH="$march" \
         -DMINGW_INSTALL_PREFIX="$arch_dir/x86_64$suffix-w64-mingw32" -B "$arch_dir"
     ninja -C "$arch_dir" llvm-clang
@@ -95,7 +95,7 @@ else
     echo ">> [3/6] skipped ($march is the base toolchain)"
 fi
 
-echo ">> [4/6] PGO training with shaderc (build_x86_64)"
+echo ">> [4/6] PGO training with shaderc"
 cmake "${common[@]}" -DLLVM_ENABLE_PGO=GEN -DCLANG_PACKAGES_LTO=ON \
     -DMINGW_INSTALL_PREFIX="$host_dir/x86_64-w64-mingw32" -B "$host_dir"
 ninja -C "$host_dir" shaderc
@@ -104,7 +104,7 @@ echo ">> [5/6] Merging profraw -> $profdata"
 llvm-profdata merge "$clang_root"/profiles/*.profraw -o "$profdata"
 rm -rf "$clang_root"/profiles/* || true
 
-echo ">> [6/6] Rebuilding LLVM with PGO (build_x86_64)"
+echo ">> [6/6] Rebuilding LLVM with PGO"
 cmake "${common[@]}" -DLLVM_ENABLE_PGO=USE -DLLVM_PROFDATA_FILE="$profdata" \
     -DMINGW_INSTALL_PREFIX="$host_dir/x86_64-w64-mingw32" -B "$host_dir"
 ninja -C "$host_dir" llvm
