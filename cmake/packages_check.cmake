@@ -3,7 +3,7 @@ set(ffmpeg_extra_libs "-lc++")
 set(mpv_lto_mode "-Db_lto_mode=thin")
 if(CLANG_PACKAGES_LTO)
     set(cargo_lto_rustflags "CARGO_PROFILE_RELEASE_LTO=thin
-                             RUSTFLAGS='-C linker-plugin-lto -C embed-bitcode -C lto=thin'")
+                             RUSTFLAGS='-C linker-plugin-lto -C embed-bitcode -C lto=thin -C target-cpu=${LLVM_ARCH}'")
     set(ffmpeg_lto "--enable-lto=thin")
     if(NOT LLVM_ARCH_HAS_AVX)
         set(zlib_nlto "LTO=0")
