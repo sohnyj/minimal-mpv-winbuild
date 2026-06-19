@@ -10,6 +10,9 @@ dlltool = '@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-dlltool'
 nasm = 'nasm'
 # exe_wrapper = 'wine'
 
+[built-in options]
+b_ndebug = 'if-release'
+
 [host_machine]
 system = 'windows'
 cpu_family = '@TARGET_CPU_FAMILY@'
