@@ -59,9 +59,9 @@ The `scripts/` directory automates the manual toolchain and mpv builds described
 
 | Script | Purpose |
 | ------ | ------- |
-| `scripts/build-llvm.sh` | Build the LLVM/Clang + Rust toolchain from scratch (PGO), fast-forwarding the toolchain sources (llvm, mingw-w64, cppwinrt) to their latest tip first. Run before `build-mpv.sh`. |
-| `scripts/build-mpv.sh` | Build and package mpv + ffmpeg against that toolchain into `./release`. Pulls package sources to their latest tip (`ninja update`) on every run. |
-| `scripts/update-repo.sh` | Fast-forward package sources and invalidate stamps (`ninja update`) in every configured build dir, without building. |
+| `scripts/build-llvm.sh` | Build the LLVM/Clang + Rust toolchain from scratch with PGO; fast-forwards the toolchain sources first. Run before `build-mpv.sh`. |
+| `scripts/build-mpv.sh` | Build and package mpv + ffmpeg against that toolchain into `./release`; fast-forwards the package sources first. |
+| `scripts/update-repo.sh` | Fast-forward the package sources in every configured build dir, without building. |
 
     scripts/build-llvm.sh                                # toolchain (default: x86-64-v3)
     scripts/build-mpv.sh                                 # mpv + ffmpeg -> ./release
@@ -93,7 +93,7 @@ The cmake command will create `clang_root` as clang sysroot where LLVM tools are
 
 `-DLLVM_ARCH=x86-64-v3` will set the `-march` option to `x86-64-v3` instructions. Other values like `native`, `znver3` should work too.
 
-## Incremental mpv build
+### Incremental mpv build
 
 To build mpv for a second time:
 

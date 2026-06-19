@@ -1,6 +1,6 @@
 #!/bin/bash
-# Build and package mpv locally for a single target arch.
-# Requires the toolchain produced by build-llvm.sh.
+# Build and package mpv for a single target arch.
+# Requires the toolchain from build-llvm.sh. Packaged .7z artifacts land in release/.
 #
 # Usage: build-mpv.sh [--march <arch>] [--mtune <cpu>] [buildroot]
 #   --march <arch>  LLVM target arch (default: x86-64-v3; e.g. znver3, x86-64)
@@ -31,20 +31,20 @@ done
 mkdir -p "$buildroot"
 buildroot=$(cd "$buildroot" && pwd)
 
-# Derive the x86_64 level suffix exactly like CMakeLists.txt:30-33
+# Derive x86_64_level exactly like CMakeLists.txt's x86_64_LEVEL
 #   x86-64-vN -> -vN ,  <other> -> -<other> ,  x86-64 -> (empty)
 if [[ $march =~ ^x86-64(-.+)$ ]]; then
-    suffix="${BASH_REMATCH[1]}"
+    x86_64_level="${BASH_REMATCH[1]}"
 elif [[ $march != "x86-64" ]]; then
-    suffix="-$march"
+    x86_64_level="-$march"
 else
-    suffix=""
+    x86_64_level=""
 fi
 
-build_dir="$buildroot/build_x86_64$suffix"
-mingw_prefix="$build_dir/x86_64$suffix-w64-mingw32"
+arch_dir="$buildroot/build_x86_64$x86_64_level"
+mingw_prefix="$arch_dir/x86_64$x86_64_level-w64-mingw32"
 clang_root="$buildroot/clang_root"
-release="$gitdir/release"
+release_dir="$gitdir/release"
 
 if [[ ! -x "$clang_root/bin/clang" ]]; then
     echo "toolchain not found at $clang_root/bin/clang -- run build-llvm.sh first" >&2
@@ -54,7 +54,7 @@ fi
 clang_flags=""
 if [[ -n "$mtune" ]]; then clang_flags="-mtune=$mtune"; fi
 
-echo ">> [1/5] Configuring mpv ($march${mtune:+, -mtune=$mtune}) in $build_dir"
+echo ">> [1/5] Configuring mpv ($march${mtune:+, -mtune=$mtune}) in $arch_dir"
 cmake \
     -DTARGET_ARCH=x86_64-w64-mingw32 \
     -DCOMPILER_TOOLCHAIN=clang \
@@ -66,26 +66,26 @@ cmake \
     -DENABLE_CCACHE=ON \
     -DCLANG_PACKAGES_LTO=ON \
     -DCLANG_FLAGS="$clang_flags" \
-    -G Ninja --fresh -B "$build_dir" -S "$gitdir"
+    -G Ninja --fresh -B "$arch_dir" -S "$gitdir"
 
 echo ">> [2/5] Downloading sources"
-ninja -C "$build_dir" download || true
+ninja -C "$arch_dir" download || true
 
 echo ">> [3/5] Updating git packages"
-ninja -C "$build_dir" update
+ninja -C "$arch_dir" update
 
 echo ">> [4/5] Building mpv"
-ninja -C "$build_dir" mpv
+ninja -C "$arch_dir" mpv
 
 echo ">> [5/5] Packaging"
-mkdir -p "$release"
-ninja -C "$build_dir" mpv-packaging
-mv "$build_dir"/mpv*.7z "$release"/ 2>/dev/null || true
+mkdir -p "$release_dir"
+ninja -C "$arch_dir" mpv-packaging
+mv "$arch_dir"/mpv*.7z "$release_dir"/ 2>/dev/null || true
 
 ffmpeg_hash=$(git -C "$buildroot/src_packages/ffmpeg" rev-parse --short HEAD)
 7z a -m0=lzma2 -mx=9 -ms=on \
-    "$release/ffmpeg-x86_64$suffix-git-$ffmpeg_hash.7z" \
+    "$release_dir/ffmpeg-x86_64$x86_64_level-git-$ffmpeg_hash.7z" \
     "$mingw_prefix/bin/ffmpeg.exe"
 
-echo ">> Done. Artifacts in $release"
-ls -1 "$release"
+echo ">> Done. Artifacts in $release_dir"
+ls -1 "$release_dir"

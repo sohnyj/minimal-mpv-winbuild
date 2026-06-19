@@ -1,5 +1,5 @@
 #!/bin/bash
-# Refresh git-based package sources and invalidate stamps by running `ninja
+# Fast-forward git-based package sources and invalidate stamps by running `ninja
 # update` in every configured build_x86_64* dir under buildroot. Standalone
 # helper for manually syncing sources between builds.
 #
@@ -34,7 +34,7 @@ for dir in "$buildroot"/build_x86_64*; do
 done
 
 if [[ $found -eq 0 ]]; then
-    echo "No configured build_x86_64* dir under $buildroot (configure a build first)" >&2
+    echo "No configured build_x86_64* dir under $buildroot" >&2
     exit 1
 fi
 exit $rc

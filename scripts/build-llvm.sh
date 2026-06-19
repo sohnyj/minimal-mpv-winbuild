@@ -1,11 +1,6 @@
 #!/bin/bash
-# Build the LLVM/Clang + Rust toolchain locally from scratch (PGO instrument ->
-# shaderc training -> PGO use) for a single target arch. Run before build-mpv.sh.
-#
-# Every run is a clean from-scratch build: it wipes the build dirs + clang_root
-# and fast-forwards the git-managed toolchain sources (llvm, mingw-w64, cppwinrt)
-# to their latest upstream tip, so every component is rebuilt from the latest
-# source.
+# Build the LLVM/Clang + Rust cross toolchain from scratch for a single target
+# arch. The result is installed to clang_root. Run before build-mpv.sh.
 #
 # Usage: build-llvm.sh [--march <arch>] [buildroot]
 #   --march <arch>  LLVM target arch (default: x86-64-v3; e.g. znver3, x86-64)
@@ -32,18 +27,18 @@ done
 mkdir -p "$buildroot"
 buildroot=$(cd "$buildroot" && pwd)
 
-# Derive the x86_64 level suffix exactly like CMakeLists.txt:30-33
+# Derive x86_64_level exactly like CMakeLists.txt's x86_64_LEVEL
 #   x86-64-vN -> -vN ,  <other> -> -<other> ,  x86-64 -> (empty)
 if [[ $march =~ ^x86-64(-.+)$ ]]; then
-    suffix="${BASH_REMATCH[1]}"
+    x86_64_level="${BASH_REMATCH[1]}"
 elif [[ $march != "x86-64" ]]; then
-    suffix="-$march"
+    x86_64_level="-$march"
 else
-    suffix=""
+    x86_64_level=""
 fi
 
 host_dir="$buildroot/build_x86_64"
-arch_dir="$buildroot/build_x86_64$suffix"
+arch_dir="$buildroot/build_x86_64$x86_64_level"
 clang_root="$buildroot/clang_root"
 profdata="$buildroot/llvm.profdata"
 
@@ -60,13 +55,13 @@ common=(
     -S "$gitdir"
 )
 
-src_repos=(llvm mingw-w64 cppwinrt)
+src_packages=(llvm mingw-w64 cppwinrt)
 
-refresh_sources() { # $1 = build dir exposing the <repo>-force-update targets
-    local dir=$1 repo targets=() names=()
-    for repo in "${src_repos[@]}"; do
-        if [[ -d "$buildroot/src_packages/$repo/.git" ]]; then
-            targets+=("$repo-force-update"); names+=("$repo")
+refresh_sources() { # $1 = build dir exposing the <pkg>-force-update targets
+    local dir=$1 pkg targets=() names=()
+    for pkg in "${src_packages[@]}"; do
+        if [[ -d "$buildroot/src_packages/$pkg/.git" ]]; then
+            targets+=("$pkg-force-update"); names+=("$pkg")
         fi
     done
     if [[ ${#targets[@]} -gt 0 ]]; then
@@ -86,10 +81,10 @@ ninja -C "$host_dir" cargo-clean
 echo ">> [2/6] Build x86_64 cross toolchain"
 ninja -C "$host_dir" llvm-clang
 
-if [[ -n "$suffix" ]]; then
-    echo ">> [3/6] $march cross toolchain"
+if [[ -n "$x86_64_level" ]]; then
+    echo ">> [3/6] Build $march cross toolchain"
     cmake "${common[@]}" -DLLVM_ARCH="$march" \
-        -DMINGW_INSTALL_PREFIX="$arch_dir/x86_64$suffix-w64-mingw32" -B "$arch_dir"
+        -DMINGW_INSTALL_PREFIX="$arch_dir/x86_64$x86_64_level-w64-mingw32" -B "$arch_dir"
     ninja -C "$arch_dir" llvm-clang
 else
     echo ">> [3/6] skipped ($march is the base toolchain)"
