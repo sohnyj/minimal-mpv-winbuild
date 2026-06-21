@@ -21,7 +21,7 @@ string(REGEX MATCH "^[^-]+" HOST_CPU ${HOST_ARCH})
 
 execute_process(COMMAND meson --version OUTPUT_VARIABLE MESON_VERSION)
 if(NOT MESON_VERSION VERSION_GREATER_EQUAL "1.3.0")
-    message(FATAL_ERROR "Meson 1.3.0 or greater is required. Install it with pip instead.")
+    message(FATAL_ERROR "Meson 1.3.0 or greater is required.")
 endif()
 
 set(TARGET_CPU_FAMILY "x86_64")

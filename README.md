@@ -40,18 +40,10 @@ GCC toolchain support is also removed; only Clang/LLD is supported.
     which is important for this project because CMake's ExternalProject module
     tends to generate makefiles which confuse GNU Make's jobserver thingy.
 
- -  As a build environment, any modern Linux distribution *should* work.
-
 ## Setup Build Environment
-### Ubuntu Linux / WSL (Windows 10)
+### Ubuntu Linux 24.04+ / WSL2
 
-    apt-get install build-essential git ninja-build cmake automake pkgconf libtool libtool-bin clang llvm lld libc++1 libc++abi1 libc++-dev libc++abi-dev libgmp-dev libmpfr-dev libmpc-dev libgcrypt-dev libmimalloc-dev python3-pip unzip p7zip-full curl ccache gettext autopoint nasm glslang-tools
-
-    pip3 install --break-system-packages meson mako jsonschema
-
-If pip installs `meson` into `~/.local/bin`, make sure that directory is on your `PATH`.
-
-    export PATH="$HOME/.local/bin:$PATH"
+    apt install automake autopoint build-essential ccache clang cmake curl gettext git glslang-tools libc++-dev libc++1 libc++abi-dev libc++abi1 libgcrypt-dev libgmp-dev libmimalloc-dev libmpc-dev libmpfr-dev libtool libtool-bin lld llvm meson nasm ninja-build p7zip-full pkgconf python3-jsonschema python3-mako unzip
 
 ## Build scripts
 
