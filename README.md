@@ -43,7 +43,9 @@ GCC toolchain support is also removed; only Clang/LLD is supported.
 ## Setup Build Environment
 ### Ubuntu Linux 24.04+ / WSL2
 
-    apt install automake autopoint build-essential ccache clang cmake curl gettext git glslang-tools libc++-dev libc++1 libc++abi-dev libc++abi1 libgcrypt-dev libgmp-dev libmimalloc-dev libmpc-dev libmpfr-dev libtool libtool-bin lld llvm meson nasm ninja-build p7zip-full pkgconf python3-jsonschema python3-mako unzip
+    apt install automake autopoint build-essential ccache clang cmake curl gettext git glslang-tools libc++-dev libc++1 libc++abi-dev libc++abi1 libgcrypt-dev libgmp-dev libmimalloc-dev libmpc-dev libmpfr-dev libtool libtool-bin lld llvm nasm ninja-build p7zip-full pkgconf python3-jsonschema python3-mako python3-pip unzip
+
+    pip3 install --break-system-packages meson
 
 ## Build scripts
 
