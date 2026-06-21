@@ -54,7 +54,7 @@ fi
 clang_flags=""
 if [[ -n "$mtune" ]]; then clang_flags="-mtune=$mtune"; fi
 
-echo ">> [1/5] Configuring mpv ($march${mtune:+, -mtune=$mtune}) in $arch_dir"
+echo ">> [1/6] Configuring mpv ($march${mtune:+, -mtune=$mtune}) in $arch_dir"
 cmake \
     -DTARGET_ARCH=x86_64-w64-mingw32 \
     -DCOMPILER_TOOLCHAIN=clang \
@@ -68,16 +68,16 @@ cmake \
     -DCLANG_FLAGS="$clang_flags" \
     -G Ninja --fresh -B "$arch_dir" -S "$gitdir"
 
-echo ">> [2/5] Downloading sources"
+echo ">> [2/6] Downloading sources"
 ninja -C "$arch_dir" download || true
 
-echo ">> [3/5] Updating git packages"
+echo ">> [3/6] Updating git packages"
 ninja -C "$arch_dir" update
 
-echo ">> [4/5] Building mpv"
+echo ">> [4/6] Building mpv"
 ninja -C "$arch_dir" mpv
 
-echo ">> [5/5] Packaging"
+echo ">> [5/6] Packaging mpv"
 mkdir -p "$release_dir"
 ninja -C "$arch_dir" mpv-packaging
 mv "$arch_dir"/mpv*.7z "$release_dir"/ 2>/dev/null || true
@@ -87,5 +87,8 @@ ffmpeg_hash=$(git -C "$buildroot/src_packages/ffmpeg" rev-parse --short HEAD)
     "$release_dir/ffmpeg-x86_64$x86_64_level-git-$ffmpeg_hash.7z" \
     "$mingw_prefix/bin/ffmpeg.exe"
 
-echo ">> Done. Artifacts in $release_dir"
+echo ">> [6/6] Cleaning Rust build artifacts"
+ninja -C "$arch_dir" cargo-clean
+
+echo ">> Artifacts: $release_dir"
 ls -1 "$release_dir"

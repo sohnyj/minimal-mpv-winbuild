@@ -90,18 +90,18 @@ else
     echo ">> [3/6] skipped ($march is the base toolchain)"
 fi
 
-echo ">> [4/6] PGO training with shaderc"
+echo ">> [4/6] Train PGO with shaderc"
 cmake "${common[@]}" -DLLVM_ENABLE_PGO=GEN -DCLANG_PACKAGES_LTO=ON \
     -DMINGW_INSTALL_PREFIX="$host_dir/x86_64-w64-mingw32" -B "$host_dir"
 ninja -C "$host_dir" shaderc
 
-echo ">> [5/6] Merging profraw -> $profdata"
+echo ">> [5/6] Merge profraw -> $profdata"
 llvm-profdata merge "$clang_root"/profiles/*.profraw -o "$profdata"
 rm -rf "$clang_root"/profiles/* || true
 
-echo ">> [6/6] Rebuilding LLVM with PGO"
+echo ">> [6/6] Rebuild LLVM with PGO"
 cmake "${common[@]}" -DLLVM_ENABLE_PGO=USE -DLLVM_PROFDATA_FILE="$profdata" \
     -DMINGW_INSTALL_PREFIX="$host_dir/x86_64-w64-mingw32" -B "$host_dir"
 ninja -C "$host_dir" llvm
 
-echo ">> Toolchain ready: $clang_root (arch sysroot: $arch_dir)"
+echo ">> Toolchain: $clang_root (arch sysroot: $arch_dir)"
