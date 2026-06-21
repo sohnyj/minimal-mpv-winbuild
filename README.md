@@ -47,6 +47,10 @@ GCC toolchain support is also removed; only Clang/LLD is supported.
 
     pip3 install --break-system-packages meson
 
+pip installs `meson` into `~/.local/bin`, so make sure that directory is on your `PATH`.
+
+    export PATH="$HOME/.local/bin:$PATH"
+
 ## Build scripts
 
 The `scripts/` directory automates the manual toolchain and mpv builds described below.
