@@ -1,11 +1,4 @@
-if(CYGWIN OR MSYS)
-    # It's much easier to just use the target CC on Cygwin than to worry about
-    # pointer size mismatches
-    set(LUAJIT_HOST_GCC ${TARGET_ARCH}-gcc)
-else()
-    set(LUAJIT_HOST_GCC gcc)
-endif()
-
+set(LUAJIT_HOST_GCC gcc)
 set(LUAJIT_GCC_ARGS "-m64")
 
 set(EXPORT
@@ -14,7 +7,7 @@ set(EXPORT
     BUILDMODE=static
     FILE_T=luajit.exe
     CFLAGS='-DUNICODE'
-    XCFLAGS='-DLUAJIT_ENABLE_LUA52COMPAT ${DISABLE_JIT}'
+    XCFLAGS='-DLUAJIT_ENABLE_LUA52COMPAT'
     PREFIX=${MINGW_INSTALL_PREFIX} Q="
 )
 
