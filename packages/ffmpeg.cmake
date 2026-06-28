@@ -73,19 +73,15 @@ ExternalProject_Add(ffmpeg
         --disable-ffprobe
         --disable-indev=gdigrab
         --disable-indev=vfwcap
-        --disable-mediafoundation
         --disable-outdevs
         --disable-sdl2
         --disable-vaapi
         --disable-vdpau
         --disable-protocol=gopher
         --disable-protocol=gophers
-        --disable-protocol=icecast
-        --disable-protocol=md5
         --disable-protocol=mmsh
         --disable-protocol=mmst
         --disable-protocol=prompeg
-        --disable-protocol=tee
         --disable-protocol=udplite
         ${ffmpeg_lto}
         --extra-cflags='-Wno-error=int-conversion'
