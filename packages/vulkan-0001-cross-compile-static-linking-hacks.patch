@@ -71,10 +71,10 @@ index 46f83d0..edb2a28 100644
      message(NOTICE "Apple STATIC lib: it will be built but not installed, and vulkan.pc and VulkanLoaderConfig.cmake won't be generated!")
      return()
 diff --git a/loader/loader.c b/loader/loader.c
-index 6c775db..2443780 100644
+index 25cea1f..a3c49c0 100644
 --- a/loader/loader.c
 +++ b/loader/loader.c
-@@ -2322,6 +2322,12 @@ BOOL __stdcall loader_initialize(PINIT_ONCE InitOnce, PVOID Parameter, PVOID *Co
+@@ -2327,6 +2327,12 @@ BOOL __stdcall loader_initialize(PINIT_ONCE InitOnce, PVOID Parameter, PVOID *Co
      (void)InitOnce;
      (void)Parameter;
      (void)Context;
@@ -104,7 +104,7 @@ index 0dc4227..e7fcea0 100644
  // All set through CMake
  #define VER_FILE_VERSION ${LOADER_VER_FILE_VERSION}
 diff --git a/loader/loader_windows.c b/loader/loader_windows.c
-index 28fa821..f149cb1 100644
+index c59c075..aeb70cc 100644
 --- a/loader/loader_windows.c
 +++ b/loader/loader_windows.c
 @@ -95,6 +95,7 @@ void windows_initialization(void) {

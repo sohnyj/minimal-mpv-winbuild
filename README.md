@@ -1,7 +1,7 @@
 # CMake-based MinGW-w64 Cross Toolchain
 
 This fork is tailored for typical playback scenarios, removing video/audio encoding libraries, legacy formats, specialized formats, and rare protocol support.
-Encoding libraries are only needed for encoding/transcoding, not playback. Image encoding is limited to png, jpg and webp.
+Encoding libraries are only needed for encoding/transcoding, not playback. Image encoding is limited to png, jpg, and webp.
 
 Only Vulkan and Direct3D 11+ are supported for GPU acceleration, with nvidia(nvcodec-headers), amd(amf-headers), and intel(libvpl).
 
