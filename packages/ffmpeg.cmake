@@ -84,7 +84,6 @@ ExternalProject_Add(ffmpeg
         --disable-protocol=prompeg
         --disable-protocol=udplite
         ${ffmpeg_lto}
-        --extra-cflags='-Wno-error=int-conversion'
         "--extra-libs='${ffmpeg_extra_libs}'" # -lstdc++ / -lc++ needs by shaderc
     BUILD_COMMAND ${MAKE}
     INSTALL_COMMAND ${MAKE} install
