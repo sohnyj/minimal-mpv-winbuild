@@ -84,7 +84,7 @@ ExternalProject_Add(ffmpeg
         --disable-protocol=prompeg
         --disable-protocol=udplite
         ${ffmpeg_lto}
-        "--extra-libs='${ffmpeg_extra_libs}'" # -lstdc++ / -lc++ needs by shaderc
+        "--extra-libs='${ffmpeg_extra_libs}'" # -lc++ for C++ deps
     BUILD_COMMAND ${MAKE}
     INSTALL_COMMAND ${MAKE} install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
