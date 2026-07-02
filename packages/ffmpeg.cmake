@@ -11,10 +11,10 @@ ExternalProject_Add(ffmpeg
         libass
         libbluray
         libiconv
+        libjxl
         libplacebo
         libsoxr
         libvpl
-        libwebp
         libxml2
         libzimg
         nvcodec-headers
@@ -50,11 +50,11 @@ ExternalProject_Add(ffmpeg
         --enable-libfreetype
         --enable-libfribidi
         --enable-libharfbuzz
+        --enable-libjxl
         --enable-libplacebo
         --enable-libshaderc
         --enable-libsoxr
         --enable-libvpl
-        --enable-libwebp
         --enable-libxml2
         --enable-libzimg
         --enable-lzma

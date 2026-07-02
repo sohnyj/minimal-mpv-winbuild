@@ -1,7 +1,7 @@
 # CMake-based MinGW-w64 Cross Toolchain
 
 This fork is tailored for typical playback scenarios, removing video/audio encoding libraries, legacy formats, specialized formats, and rare protocol support.
-Encoding libraries are only needed for encoding/transcoding, not playback. Image encoding is limited to png, jpg, and webp.
+Encoding libraries are only needed for encoding/transcoding, not playback. Image encoding is limited to png, jpg, and jxl.
 
 Only Vulkan and Direct3D 11+ are supported for GPU acceleration, with nvidia(nvcodec-headers), amd(amf-headers), and intel(libvpl).
 
@@ -14,7 +14,7 @@ Autobuild runs daily at UTC 00:00.
 
 - **Video** — x264, x265, aom, svtav1, uavs3d, davs2, libvpx, xvidcore, avisynth-headers, vapoursynth
 - **Audio** — lame, opus (with libopusenc, opusfile, opus-tools, opus-dnn), flac, vorbis, ogg, speex, libopenmpt, libmodplug, game-music-emu, libmysofa, libbs2b, openal-soft, rubberband (with fftw3, libsamplerate)
-- **Image** — libjxl (and highway)
+- **Image** — libwebp
 - **Subtitle** — libaribcaption, libzvbi
 - **Disc playback** — libdvdcss, libdvdread, libdvdnav
 - **Network** — libssh, libsrt, megasdk (with cryptopp, libsodium, libuv, sqlite, readline, termcap)
@@ -134,12 +134,12 @@ After that, build mpv as usual:
     - libass
     - libbluray (with libudfread)
     - libjpeg
+    - libjxl (with highway)
     - libplacebo (with glad, fast_float, xxhash)
     - libpng
     - libsoxr
     - libunibreak
     - libvpl
-    - libwebp
     - libxml2
     - libzimg (with graphengine)
     - luajit

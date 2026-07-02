@@ -34,7 +34,6 @@ list(APPEND ep
     fontconfig
     libass
     subrandr
-    libwebp
     libzimg
     dav1d
     luajit
@@ -43,6 +42,8 @@ list(APPEND ep
     libplacebo
     xz
     libarchive
+    highway
+    libjxl
     ffmpeg
     libpsl
     nghttp2
