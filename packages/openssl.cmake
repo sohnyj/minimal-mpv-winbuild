@@ -15,8 +15,8 @@ ExternalProject_Add(openssl
         --prefix=${MINGW_INSTALL_PREFIX}
         --libdir=lib
         --release
-        ${openssl_target}
-        ${openssl_ec_opt}
+        mingw64
+        enable-ec_nistp_64_gcc_128
         threads
         zlib
         enable-brotli

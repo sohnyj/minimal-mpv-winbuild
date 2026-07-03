@@ -39,8 +39,8 @@ ExternalProject_Add_Step(vapoursynth generate-def
 ExternalProject_Add_Step(vapoursynth generate-lib
     DEPENDEES generate-def
     WORKING_DIRECTORY <SOURCE_DIR>
-    COMMAND ${EXEC} ${TARGET_ARCH}-dlltool -m ${dlltool_image} -d VSScript.def -l VSScript.lib
-    COMMAND ${EXEC} ${TARGET_ARCH}-dlltool -m ${dlltool_image} -d VapourSynth.def -l VapourSynth.lib
+    COMMAND ${EXEC} ${TARGET_ARCH}-dlltool -m i386:x86-64 -d VSScript.def -l VSScript.lib
+    COMMAND ${EXEC} ${TARGET_ARCH}-dlltool -m i386:x86-64 -d VapourSynth.def -l VapourSynth.lib
     LOG 1
 )
 

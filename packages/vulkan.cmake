@@ -16,9 +16,8 @@ ExternalProject_Add(vulkan
         -DBUILD_SHARED_LIBS=OFF
         -DBUILD_STATIC_LOADER=ON
         -DBUILD_TESTS=OFF
+        -DUSE_GAS=ON
         -DVULKAN_HEADERS_INSTALL_DIR=${MINGW_INSTALL_PREFIX}
-        ${vulkan_asm}
-        -DCMAKE_C_FLAGS='${CMAKE_C_FLAGS}'
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/loader/libvulkan.a ${MINGW_INSTALL_PREFIX}/lib/libvulkan.a
             COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/loader/vulkan_own.pc ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/vulkan.pc
