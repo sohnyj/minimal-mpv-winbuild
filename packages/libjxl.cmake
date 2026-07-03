@@ -9,7 +9,8 @@ ExternalProject_Add(libjxl
         highway
     GIT_REPOSITORY https://github.com/libjxl/libjxl.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--filter=tree:0"
+    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !doc !examples"
     GIT_REMOTE_NAME origin
     GIT_TAG main
     GIT_SUBMODULES ""
