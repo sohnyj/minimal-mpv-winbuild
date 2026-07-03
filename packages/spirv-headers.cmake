@@ -4,7 +4,6 @@ ExternalProject_Add(spirv-headers
     GIT_CLONE_FLAGS "--filter=tree:0"
     GIT_REMOTE_NAME origin
     GIT_TAG main
-    GIT_RESET 575b6512579ebde466ed3dfc04e413439d14d95d
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ${EXEC} CONF=1 cmake -H<SOURCE_DIR> -B<BINARY_DIR>
         -G Ninja
