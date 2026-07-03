@@ -11,7 +11,7 @@ ExternalProject_Add(curl
     GIT_REPOSITORY https://github.com/curl/curl.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--sparse --filter=tree:0"
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !docs"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !docs !tests"
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ${EXEC} cmake -H<SOURCE_DIR> -B<BINARY_DIR>
         -G Ninja
