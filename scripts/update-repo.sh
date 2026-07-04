@@ -1,7 +1,6 @@
 #!/bin/bash
-# Fast-forward git-based package sources and invalidate stamps by running `ninja
-# update` in every configured build_x86_64* dir under buildroot. Standalone
-# helper for manually syncing sources between builds.
+# Force-update git-based package sources. Runs `ninja update`
+# in every configured build_x86_64* dir.
 #
 # Usage: update-repo.sh [buildroot]
 #   buildroot  location of the build_x86_64* dirs

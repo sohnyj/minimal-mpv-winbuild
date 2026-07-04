@@ -3,7 +3,7 @@
 This fork is tailored for typical playback scenarios, removing video/audio encoding libraries, legacy formats, specialized formats, and rare protocol support.
 Encoding libraries are only needed for encoding/transcoding, not playback. Image encoding is limited to png, jpg, and jxl.
 
-Only Vulkan and Direct3D 11+ are supported for GPU acceleration, with nvidia(nvcodec-headers), amd(amf-headers), and intel(libvpl).
+Only Vulkan and Direct3D 11 are supported for GPU acceleration, with nvidia(nvcodec-headers), amd(amf-headers), and intel(libvpl).
 
 Autobuild runs daily at UTC 00:00.
 
@@ -30,7 +30,7 @@ GCC toolchain support is also removed; only Clang/LLD is supported.
 ## Minimum Requirements
 
 - **OS**: Windows 10 or later
-- **CPU**: x86_64-v3 (AVX2 support required, e.g. Intel Haswell / AMD Excavator or newer)
+- **CPU**: x86_64-v3 (AVX2 support required)
 
 ## Prerequisites
 
@@ -56,15 +56,15 @@ The `scripts/` directory automates the manual toolchain and mpv builds described
 
 | Script | Purpose |
 | ------ | ------- |
-| `scripts/build-llvm.sh` | Build the LLVM/Clang + Rust toolchain from scratch with PGO; fast-forwards the toolchain sources first. Run before `build-mpv.sh`. |
-| `scripts/build-mpv.sh` | Build and package mpv + ffmpeg against that toolchain into `./release`; fast-forwards the package sources first. |
-| `scripts/update-repo.sh` | Fast-forward the package sources in every configured build dir, without building. |
+| `build-llvm.sh` | Build the LLVM/Clang + Rust toolchain from scratch with PGO. Run before `build-mpv.sh`. |
+| `build-mpv.sh` | Build and package mpv + ffmpeg against that toolchain into `./release`. |
+| `update-repo.sh` | Force-update git-based package sources. |
+| `clean-repo.sh` | Reset git-based package sources for a fresh re-clone. |
 
-    scripts/build-llvm.sh                                # toolchain (default: x86-64-v3)
-    scripts/build-mpv.sh                                 # mpv + ffmpeg -> ./release
-
-    scripts/build-llvm.sh --march znver3                 # other arch
-    scripts/build-mpv.sh  --march znver3 --mtune znver3
+    build-llvm.sh                                # toolchain (default: x86-64-v3)
+    build-mpv.sh                                 # mpv + ffmpeg
+    build-llvm.sh --march znver3                 # other arch
+    build-mpv.sh  --march znver3 --mtune znver3
 
 Each takes an optional trailing `buildroot` (the directory holding `clang_root`/`src_packages`/`build_*`), defaulting to the repository root.
 
@@ -161,4 +161,4 @@ After that, build mpv as usual:
 
 ## Acknowledgements
 
-This project was originally created by [lachs0r](https://github.com/lachs0r/mingw-w64-cmake) and heavily modified by [shinchiro](https://github.com/shinchiro/mpv-winbuild-cmake). This fork is a minimal build trimmed down for personal use.
+This project was originally created by [lachs0r](https://github.com/lachs0r/mingw-w64-cmake) and heavily modified by [shinchiro](https://github.com/shinchiro/mpv-winbuild-cmake).

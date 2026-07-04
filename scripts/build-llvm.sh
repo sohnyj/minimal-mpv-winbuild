@@ -1,6 +1,6 @@
 #!/bin/bash
-# Build the LLVM/Clang + Rust cross toolchain from scratch for a single target
-# arch. The result is installed to clang_root. Run before build-mpv.sh.
+# Build the LLVM/Clang + Rust cross toolchain from scratch for a target arch.
+# Installs to clang_root. Run before build-mpv.sh.
 #
 # Usage: build-llvm.sh [--march <arch>] [buildroot]
 #   --march <arch>  LLVM target arch (default: x86-64-v3; e.g. znver3, x86-64)

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build and package mpv for a single target arch.
+# Build and package mpv for a target arch.
 # Requires the toolchain from build-llvm.sh. Packaged .7z artifacts land in release/.
 #
 # Usage: build-mpv.sh [--march <arch>] [--mtune <cpu>] [buildroot]
