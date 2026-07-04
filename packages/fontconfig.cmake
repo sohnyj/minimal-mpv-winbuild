@@ -19,10 +19,12 @@ ExternalProject_Add(fontconfig
         --cross-file=${MESON_CROSS}
         --buildtype=release
         --default-library=static
+        -Dcache-build=disabled
         -Ddoc=disabled
+        -Dnls=disabled
+        -Dtests-external-fonts=disabled
         -Dtests=disabled
         -Dtools=disabled
-        -Dcache-build=disabled
         -Dxml-backend=libxml2
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
