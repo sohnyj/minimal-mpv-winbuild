@@ -1,7 +1,8 @@
 ExternalProject_Add(libvpl
     GIT_REPOSITORY https://github.com/intel/libvpl.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--filter=tree:0"
+    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !/doc !/examples /examples/CMakeLists.txt"
     GIT_REMOTE_NAME origin
     GIT_TAG main
     UPDATE_COMMAND ""
