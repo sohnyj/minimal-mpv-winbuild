@@ -34,7 +34,8 @@ jobs:
             clang_flags: "-mtune=znver3"
     env:
       BIT: x86_64
-      BUILD_DIR: build_x86_64-${{ matrix.x86_64_level }}
+      SYSROOT_LEVEL: v3
+      BUILD_DIR: build_x86_64-v3
     steps:
       - name: Installing dependencies
         run: |
@@ -85,9 +86,7 @@ jobs:
         uses: actions/cache/restore@main
         with:
           path: src_packages
-          key: repository-${{ matrix.x86_64_level }}
-          restore-keys: |
-            repository-
+          key: repository
 
       - name: Loading ${{ matrix.x86_64_level }} sysroot cache
         uses: actions/cache/restore@main
@@ -96,11 +95,11 @@ jobs:
             ${{ env.BUILD_DIR }}
           key: sysroot-${{ matrix.x86_64_level }}-${{ steps.toolchain_id.outputs.value }}
           restore-keys: |
-            clang-${{ matrix.x86_64_level }}_toolchain-${{ steps.toolchain_id.outputs.value }}
+            clang-${{ env.SYSROOT_LEVEL }}_toolchain-${{ steps.toolchain_id.outputs.value }}
 
       - name: Configuring CMake & Downloading source
         run: |
-          cmake -DTARGET_ARCH=$BIT-w64-mingw32 -DCOMPILER_TOOLCHAIN=clang -DLLVM_ARCH=${{ matrix.llvm_arch }} -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/$BUILD_DIR/$BIT-${{ matrix.x86_64_level }}-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -DENABLE_CCACHE=ON -DCLANG_PACKAGES_LTO=ON -DCLANG_FLAGS="${{ matrix.clang_flags }}" -G Ninja --fresh -B $BUILD_DIR -S $PWD
+          cmake -DTARGET_ARCH=$BIT-w64-mingw32 -DCOMPILER_TOOLCHAIN=clang -DLLVM_ARCH=${{ matrix.llvm_arch }} -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/$BUILD_DIR/$BIT-${{ env.SYSROOT_LEVEL }}-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -DENABLE_CCACHE=ON -DCLANG_PACKAGES_LTO=ON -DCLANG_FLAGS="${{ matrix.clang_flags }}" -G Ninja --fresh -B $BUILD_DIR -S $PWD
           ninja -C $BUILD_DIR download || true
 
       - name: Building mpv
@@ -127,7 +126,7 @@ jobs:
 
       - name: Copying ffmpeg
         run: |
-          7z a -m0=lzma2 -mx=9 -ms=on release_${{ matrix.x86_64_level }}/ffmpeg-$BIT-${{ matrix.x86_64_level }}-git-${{ steps.source_revisions.outputs.ffmpeg }}.7z ./$BUILD_DIR/$BIT-${{ matrix.x86_64_level }}-w64-mingw32/bin/ffmpeg.exe
+          7z a -m0=lzma2 -mx=9 -ms=on release_${{ matrix.x86_64_level }}/ffmpeg-$BIT-${{ matrix.x86_64_level }}-git-${{ steps.source_revisions.outputs.ffmpeg }}.7z ./$BUILD_DIR/$BIT-${{ env.SYSROOT_LEVEL }}-w64-mingw32/bin/ffmpeg.exe
 
       - name: Collecting logs
         if: always()
@@ -167,20 +166,21 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          REPOSITORY_KEY: repository-${{ matrix.x86_64_level }}
           SYSROOT_PREFIX: sysroot-${{ matrix.x86_64_level }}-
         run: |
-          gh cache delete "$REPOSITORY_KEY" --repo "$REPO" || true
+          if [ "${{ matrix.x86_64_level }}" = "${{ env.SYSROOT_LEVEL }}" ]; then
+            gh cache delete "repository" --repo "$REPO" || true
+          fi
           for key in $(gh cache list --repo "$REPO" --key "$SYSROOT_PREFIX" --json key --limit 100 --jq '.[].key'); do
             gh cache delete "$key" --repo "$REPO" || true
           done
 
       - name: Saving repository cache
         uses: actions/cache/save@main
-        if: always()
+        if: ${{ always() && matrix.x86_64_level == env.SYSROOT_LEVEL }}
         with:
           path: src_packages
-          key: repository-${{ matrix.x86_64_level }}
+          key: repository
 
       - name: Saving ${{ matrix.x86_64_level }} sysroot cache
         uses: actions/cache/save@main
