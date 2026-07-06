@@ -20,9 +20,9 @@ function(cleanup _name _last_step)
         else()
             set(remove_cmd "find <BINARY_DIR> -mindepth 1 -delete && git -C <SOURCE_DIR> clean -df")
         endif()
-        set(COMMAND_FORCE_UPDATE COMMAND bash -c "git -C <SOURCE_DIR> am --abort 2> /dev/null || true"
+        set(COMMAND_FORCE_UPDATE COMMAND bash -c "[ -e <SOURCE_DIR>/.git ] && git -C <SOURCE_DIR> am --abort 2> /dev/null || true"
                                  COMMAND ${stamp_dir}/reset_head.sh
-                                 COMMAND bash -c "git -C <SOURCE_DIR> restore .")
+                                 COMMAND bash -c "[ -e <SOURCE_DIR>/.git ] && git -C <SOURCE_DIR> restore . || true")
     endif()
 
     # <STAMP_DIR> doesn't resolve into full path, so <LOG_DIR> is used instead since its same folder.
@@ -95,6 +95,7 @@ function(force_rebuild_git _name)
 file(WRITE ${stamp_dir}/reset_head.sh
 "#!/bin/bash
 set -e
+[[ -e \"${source_dir}/.git\" ]] || exit 0
 if [[ ! -f \"${stamp_dir}/${_name}-patch\"  || \"${stamp_dir}/${_name}-download\" -nt \"${stamp_dir}/${_name}-patch\" || ! -f \"${stamp_dir}/HEAD\" || \"$(cat ${stamp_dir}/HEAD)\" != \"$(git -C ${source_dir} rev-parse @{u})\" ]]; then
     git -C ${source_dir} reset --hard ${reset} -q
     if [[ -z \"${git_reset}\" ]]; then
@@ -113,8 +114,8 @@ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_
         EXCLUDE_FROM_MAIN TRUE
         INDEPENDENT TRUE
         WORKING_DIRECTORY <SOURCE_DIR>
-        COMMAND bash -c "git am --abort 2> /dev/null || true"
-        COMMAND bash -c "git fetch --filter=tree:0 --no-recurse-submodules || true"
+        COMMAND bash -c "[ -e <SOURCE_DIR>/.git ] && git am --abort 2> /dev/null || true"
+        COMMAND bash -c "[ -e <SOURCE_DIR>/.git ] && git fetch --filter=tree:0 --no-recurse-submodules || true"
         COMMAND ${stamp_dir}/reset_head.sh
     )
     ExternalProject_Add_StepTargets(${_name} force-update)
