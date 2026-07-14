@@ -19,7 +19,6 @@ ExternalProject_Add(ffmpeg
         libzimg
         nvcodec-headers
         openssl
-        shaderc
         spirv-headers
         xz
         zlib
@@ -52,7 +51,6 @@ ExternalProject_Add(ffmpeg
         --enable-libharfbuzz
         --enable-libjxl
         --enable-libplacebo
-        --enable-libshaderc
         --enable-libsoxr
         --enable-libvpl
         --enable-libxml2
