@@ -4,8 +4,6 @@ ExternalProject_Add(libarchive
         zlib
         zstd
         xz
-        openssl
-        libxml2
     GIT_REPOSITORY https://github.com/libarchive/libarchive.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
@@ -20,10 +18,12 @@ ExternalProject_Add(libarchive
         -DBUILD_SHARED_LIBS=OFF
         -DENABLE_ZLIB=ON
         -DENABLE_ZSTD=ON
-        -DENABLE_OPENSSL=ON
+        -DENABLE_OPENSSL=OFF
+        -DENABLE_CNG=ON
         -DENABLE_BZip2=ON
         -DENABLE_ICONV=ON
-        -DENABLE_LIBXML2=ON
+        -DENABLE_LIBXML2=OFF
+        -DENABLE_WIN32_XMLLITE=OFF
         -DENABLE_EXPAT=OFF
         -DENABLE_LZO=OFF
         -DENABLE_LZMA=ON
