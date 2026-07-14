@@ -7,15 +7,16 @@ Only Vulkan and Direct3D 11 are supported for GPU acceleration, with nvidia(nvco
 
 Autobuild runs daily at UTC 00:00.
 
-- For easy updates: [sohnyj/app-updater](https://github.com/sohnyj/app-updater)
-- single-instance mpv launcher: [sohnyj/umpv-rust](https://github.com/sohnyj/umpv-rust)
+- easy updates: [sohnyj/app-updater](https://github.com/sohnyj/app-updater)
+- single-instance mpv launcher: [sohnyj/umpv-rs](https://github.com/sohnyj/umpv-rs)
 
 ## What's removed
 
 - **Video** — x264, x265, aom, svtav1, uavs3d, davs2, libvpx, xvidcore, avisynth-headers, vapoursynth
-- **Audio** — lame, opus (with libopusenc, opusfile, opus-tools, opus-dnn), flac, vorbis, ogg, speex, libopenmpt, libmodplug, game-music-emu, libmysofa, libbs2b, openal-soft, rubberband (with fftw3, libsamplerate)
+- **Audio** — lame, opus (with libopusenc, opusfile, opus-tools, opus-dnn), flac, vorbis, ogg, speex, libopenmpt, libmodplug, game-music-emu, libmysofa, libbs2b, openal-soft, rubberband (with libsamplerate)
 - **Image** — libwebp
 - **Subtitle** — libaribcaption, libzvbi
+- **Font** — fontconfig
 - **Disc playback** — libdvdcss, libdvdread, libdvdnav
 - **Network** — libssh, libsrt, megasdk (with cryptopp, libsodium, libuv, sqlite, readline, termcap)
 - **Graphics** — ANGLE headers
@@ -125,7 +126,6 @@ After that, build mpv as usual:
     - curl (with libpsl, nghttp2, nghttp3, ngtcp2)
     - dav1d
     - FFmpeg
-    - fontconfig
     - freetype2
     - fribidi
     - harfbuzz

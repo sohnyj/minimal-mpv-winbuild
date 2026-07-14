@@ -1,6 +1,5 @@
 ExternalProject_Add(rubberband
     DEPENDS
-        fftw3
         libsamplerate
     GIT_REPOSITORY https://github.com/breakfastquay/rubberband.git
     SOURCE_DIR ${SOURCE_LOCATION}
@@ -14,7 +13,7 @@ ExternalProject_Add(rubberband
         --cross-file=${MESON_CROSS}
         --buildtype=release
         --default-library=static
-        -Dfft=fftw
+        -Dfft=builtin
         -Dresampler=libsamplerate
         -Djni=disabled
         -Dtests=disabled
