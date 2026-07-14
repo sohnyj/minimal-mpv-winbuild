@@ -70,6 +70,8 @@ ExternalProject_Add(mpv
         -Drubberband=disabled
         -Dtests=false
         -Dvapoursynth=disabled
+        "-Dc_link_args='-Wl,--delayload=vulkan-1.dll -ldloadhelper'"
+        "-Dcpp_link_args='-Wl,--delayload=vulkan-1.dll -ldloadhelper'"
     BUILD_COMMAND ${EXEC} LTO_JOB=1 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
