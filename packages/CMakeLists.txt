@@ -31,7 +31,6 @@ list(APPEND ep
     harfbuzz
     libudfread
     libbluray
-    fontconfig
     libass
     subrandr
     libzimg

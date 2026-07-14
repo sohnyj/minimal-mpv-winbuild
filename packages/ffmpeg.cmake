@@ -3,7 +3,6 @@ ExternalProject_Add(ffmpeg
         amf-headers
         bzip2
         dav1d
-        fontconfig
         freetype2
         fribidi
         harfbuzz
@@ -45,7 +44,6 @@ ExternalProject_Add(ffmpeg
         --enable-libass
         --enable-libbluray
         --enable-libdav1d
-        --enable-libfontconfig
         --enable-libfreetype
         --enable-libfribidi
         --enable-libharfbuzz
