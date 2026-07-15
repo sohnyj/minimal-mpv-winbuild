@@ -123,7 +123,7 @@ After that, build mpv as usual:
     - amf-headers
     - brotli
     - bzip2
-    - curl (with libpsl, nghttp2, nghttp3, ngtcp2)
+    - curl (with c-ares, libpsl, nghttp2, nghttp3, ngtcp2)
     - dav1d
     - FFmpeg
     - freetype2
