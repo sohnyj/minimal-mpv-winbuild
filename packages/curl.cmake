@@ -1,6 +1,7 @@
 ExternalProject_Add(curl
     DEPENDS
         brotli
+        c-ares
         libpsl
         nghttp2
         nghttp3
@@ -26,6 +27,7 @@ ExternalProject_Add(curl
         -DBUILD_SHARED_LIBS=OFF
         -DBUILD_STATIC_LIBS=ON
         -DBUILD_TESTING=OFF
+        -DCARES_USE_STATIC_LIBS=ON
         -DCURL_BROTLI=ON
         -DCURL_CA_NATIVE=ON
         -DCURL_DISABLE_AWS=ON
@@ -60,7 +62,7 @@ ExternalProject_Add(curl
         -DCURL_USE_WOLFSSL=OFF
         -DCURL_ZLIB=ON
         -DCURL_ZSTD=ON
-        -DENABLE_ARES=OFF
+        -DENABLE_ARES=ON
         -DENABLE_CURL_MANUAL=OFF
         -DENABLE_THREADED_RESOLVER=ON
         -DENABLE_UNICODE=ON
