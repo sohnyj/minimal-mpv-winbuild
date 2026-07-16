@@ -1,19 +1,25 @@
 set_property(DIRECTORY PROPERTY EP_STEP_TARGETS download)
 include(${PROJECT_SOURCE_DIR}/cmake/toolchain_check.cmake)
 list(APPEND ep
+    # depth 0
+    cppwinrt
+    llvm
     ${llvm_wrapper}
     mingw-w64
-    mingw-w64-headers
-    cppwinrt
-    mingw-w64-crt
-    gendef
-    widl
     rustup
-    llvm
-    llvm-compiler-rt-builtin
-    llvm-libcxx
+    # depth 1
+    gendef
     llvm-compiler-rt
+    mingw-w64-headers
+    widl
+    # depth 2
+    mingw-w64-crt
+    # depth 3
+    llvm-compiler-rt-builtin
     winpthreads
+    # depth 4
+    llvm-libcxx
+    # depth 5
     llvm-clang
 )
 foreach(package IN LISTS ep)
