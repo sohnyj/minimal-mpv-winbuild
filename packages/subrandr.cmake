@@ -7,6 +7,7 @@ ExternalProject_Add(subrandr
     GIT_CLONE_FLAGS "--filter=tree:0"
     GIT_REMOTE_NAME origin
     GIT_TAG master
+    BUILD_IN_SOURCE 1
     UPDATE_COMMAND ""
     PATCH_COMMAND ""
     CONFIGURE_COMMAND ""
@@ -14,7 +15,7 @@ ExternalProject_Add(subrandr
         LD_PRELOAD=
         CARGO_PROFILE_RELEASE_CODEGEN_UNITS=1
         ${cargo_lto_rustflags}
-        cargo -Z unstable-options -C <SOURCE_DIR> xtask install
+        cargo xtask install
         --prefix ${MINGW_INSTALL_PREFIX}
         --target ${TARGET_CPU}-pc-windows-${rust_target}
         --shared-library false
