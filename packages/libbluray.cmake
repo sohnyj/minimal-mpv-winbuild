@@ -1,8 +1,8 @@
 ExternalProject_Add(libbluray
     DEPENDS
         freetype2
-        libxml2
         libudfread
+        libxml2
     GIT_REPOSITORY https://code.videolan.org/videolan/libbluray.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
@@ -15,8 +15,8 @@ ExternalProject_Add(libbluray
         --cross-file=${MESON_CROSS}
         --buildtype=release
         --default-library=static
-        -Denable_tools=false
         -Dbdj_jar=disabled
+        -Denable_tools=false
         -Dfreetype=enabled
         -Dlibxml2=enabled
         "-Dc_args='-Ddec_init=libbluray_dec_init'"

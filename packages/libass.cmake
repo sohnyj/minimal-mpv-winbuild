@@ -1,8 +1,8 @@
 ExternalProject_Add(libass
     DEPENDS
-        harfbuzz
         freetype2
         fribidi
+        harfbuzz
         libiconv
         libunibreak
     GIT_REPOSITORY https://github.com/libass/libass.git

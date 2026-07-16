@@ -1,8 +1,8 @@
 ExternalProject_Add(freetype2
     DEPENDS
+        brotli
         libpng
         zlib
-        brotli
     GIT_REPOSITORY https://github.com/freetype/freetype.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--sparse --filter=tree:0"

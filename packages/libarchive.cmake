@@ -1,9 +1,9 @@
 ExternalProject_Add(libarchive
     DEPENDS
         bzip2
+        xz
         zlib
         zstd
-        xz
     GIT_REPOSITORY https://github.com/libarchive/libarchive.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"

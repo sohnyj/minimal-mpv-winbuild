@@ -9,8 +9,8 @@ ExternalProject_Add(dav1d
         --cross-file=${MESON_CROSS}
         --buildtype=release
         --default-library=static
-        -Denable_tools=false
         -Denable_tests=false
+        -Denable_tools=false
         -Dxxhash_muxer=disabled
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install

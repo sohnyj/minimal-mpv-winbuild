@@ -17,8 +17,8 @@ ExternalProject_Add(subrandr
         cargo -Z unstable-options -C <SOURCE_DIR> xtask install
         --prefix ${MINGW_INSTALL_PREFIX}
         --target ${TARGET_CPU}-pc-windows-${rust_target}
-        --static-library true
         --shared-library false
+        --static-library true
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

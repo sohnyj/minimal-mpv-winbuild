@@ -1,20 +1,27 @@
 set_property(DIRECTORY PROPERTY EP_STEP_TARGETS download)
 include(${PROJECT_SOURCE_DIR}/cmake/packages_check.cmake)
 list(APPEND ep
+    # depth 0
     amf-headers
     brotli
     bzip2
     c-ares
+    dav1d
     fast_float
     fribidi
     glad
     glslang
     graphengine
+    highway
     libiconv
     libjpeg
+    libpsl
     libsoxr
+    libudfread
     libunibreak
     libvpl
+    nghttp2
+    nghttp3
     nvcodec-headers
     spirv-cross
     spirv-headers
@@ -22,34 +29,34 @@ list(APPEND ep
     uchardet
     vulkan-header
     xxhash
+    xz
     zlib
     zstd
+    # depth 1
     lcms2
+    libarchive
     libpng
     libxml2
+    libzimg
+    luajit
     openssl
+    shaderc
+    vulkan
+    # depth 2
     freetype2
+    libjxl
+    libplacebo
+    ngtcp2
+    # depth 3
+    curl
     harfbuzz
-    libudfread
     libbluray
+    # depth 4
     libass
     subrandr
-    libzimg
-    dav1d
-    luajit
-    vulkan
-    shaderc
-    libplacebo
-    xz
-    libarchive
-    highway
-    libjxl
+    # depth 5
     ffmpeg
-    libpsl
-    nghttp2
-    nghttp3
-    ngtcp2
-    curl
+    # depth 6
     mpv
     mpv-packaging
 )

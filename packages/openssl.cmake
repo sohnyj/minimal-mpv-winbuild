@@ -1,8 +1,8 @@
 ExternalProject_Add(openssl
     DEPENDS
+        brotli
         zlib
         zstd
-        brotli
     GIT_REPOSITORY https://github.com/openssl/openssl.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--sparse --filter=tree:0"
@@ -16,11 +16,12 @@ ExternalProject_Add(openssl
         --libdir=lib
         --release
         mingw64
+        enable-brotli
         enable-ec_nistp_64_gcc_128
+        enable-zstd
         threads
         zlib
-        enable-brotli
-        enable-zstd
+        no-autoload-config
         no-apps
         no-aria
         no-async
@@ -69,7 +70,6 @@ ExternalProject_Add(openssl
         no-ts
         no-uplink
         no-whirlpool
-        no-autoload-config
     BUILD_COMMAND ${MAKE} build_sw
     INSTALL_COMMAND ${MAKE} install_sw
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
