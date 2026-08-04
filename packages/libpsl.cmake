@@ -4,6 +4,7 @@ ExternalProject_Add(libpsl
     GIT_CLONE_FLAGS "--sparse --filter=tree:0"
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !/fuzz !tests !tools tools/meson.build"
     UPDATE_COMMAND ""
+    GIT_RESET aa3a80e18f25caf3916636c8668dcc0fff7c016d # v0.23.1
     CONFIGURE_COMMAND ""
     COMMAND ${EXEC} echo > <SOURCE_DIR>/tools/meson.build
     COMMAND ${EXEC} CONF=1 meson setup <BINARY_DIR> <SOURCE_DIR>
