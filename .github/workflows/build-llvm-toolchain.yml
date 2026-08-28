@@ -44,8 +44,8 @@ jobs:
         with:
           ref: master
 
-      - name: Set cache version
-        id: cache_version
+      - name: Set cache date
+        id: cache_date
         run: echo "value=$(date -u +'%Y%m%d')" >> $GITHUB_OUTPUT
 
       - name: Loading clang root
@@ -59,7 +59,7 @@ jobs:
             clang_root-x86_64-
 
       - name: Loading x86_64 toolchain
-        id: x86_64_cache
+        id: x86_64_toolchain_cache
         if: ${{ github.event.inputs.fresh_build != 'true' }}
         uses: actions/cache/restore@main
         with:
@@ -69,7 +69,7 @@ jobs:
             clang-x86_64_toolchain-
 
       - name: Loading x86_64-v3 toolchain
-        id: v3_cache
+        id: x86_64-v3_toolchain_cache
         if: ${{ github.event.inputs.fresh_build != 'true' }}
         uses: actions/cache/restore@main
         with:
@@ -82,11 +82,11 @@ jobs:
         id: cache_suffix
         env:
           CLANG_ROOT_KEY: ${{ steps.clang_root_cache.outputs.cache-matched-key }}
-          X86_64_KEY: ${{ steps.x86_64_cache.outputs.cache-matched-key }}
-          V3_KEY: ${{ steps.v3_cache.outputs.cache-matched-key }}
-          FRESH: ${{ steps.cache_version.outputs.value }}-${{ github.run_id }}
+          X86_64_TOOLCHAIN_KEY: ${{ steps.x86_64_toolchain_cache.outputs.cache-matched-key }}
+          X86_64_V3_TOOLCHAIN_KEY: ${{ steps.x86_64-v3_toolchain_cache.outputs.cache-matched-key }}
+          FRESH: ${{ steps.cache_date.outputs.value }}-${{ github.run_id }}
         run: |
-          if [ -n "$CLANG_ROOT_KEY" ] && [ -n "$X86_64_KEY" ] && [ -n "$V3_KEY" ]; then
+          if [ -n "$CLANG_ROOT_KEY" ] && [ -n "$X86_64_TOOLCHAIN_KEY" ] && [ -n "$X86_64_V3_TOOLCHAIN_KEY" ]; then
             echo "value=${CLANG_ROOT_KEY#clang_root-x86_64-}" >> $GITHUB_OUTPUT
             echo "rebuilt=false" >> $GITHUB_OUTPUT
           else
@@ -103,14 +103,14 @@ jobs:
           ninja -C build_x86_64 cargo-clean
 
       - name: Building x86_64 toolchain
-        if: ${{ steps.x86_64_cache.outputs.cache-matched-key == ''
+        if: ${{ steps.x86_64_toolchain_cache.outputs.cache-matched-key == ''
              || steps.clang_root_cache.outputs.cache-matched-key == '' }}
         run: |
           cmake -DTARGET_ARCH=x86_64-w64-mingw32 -DLLVM_ENABLE_PGO=GEN -DCOMPILER_TOOLCHAIN=clang -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/build_x86_64/x86_64-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -G Ninja -B build_x86_64 -S $PWD
           ninja -C build_x86_64 llvm-clang
 
       - name: Building x86_64-v3 toolchain
-        if: ${{ steps.v3_cache.outputs.cache-matched-key == ''
+        if: ${{ steps.x86_64-v3_toolchain_cache.outputs.cache-matched-key == ''
              || steps.clang_root_cache.outputs.cache-matched-key == '' }}
         run: |
           cmake -DTARGET_ARCH=x86_64-w64-mingw32 -DCOMPILER_TOOLCHAIN=clang -DLLVM_ARCH=x86-64-v3 -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/build_x86_64-v3/x86_64-v3-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -G Ninja -B build_x86_64-v3 -S $PWD
@@ -144,7 +144,7 @@ jobs:
           find build_x86_64 -type f -iname "*-*.log" -exec cp -f -t llvm-x86_64-logs {} + || true
           find build_x86_64-v3 -type f -iname "*-*.log" -exec cp -f -t llvm-x86_64-v3-logs {} + || true
 
-      - name: Cleanup
+      - name: Deleting build state
         run: |
           rm -rf {build_x86_64,build_x86_64-v3}/{toolchain,packages} || true
 
