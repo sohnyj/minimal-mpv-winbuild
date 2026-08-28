@@ -1,0 +1,25 @@
+From 3447b0f46c538070b52b825a00ac10169bbe827f Mon Sep 17 00:00:00 2001
+From: sohnyj <271139641+sohnyj@users.noreply.github.com>
+Date: Sat, 29 Aug 2026 06:22:23 +0900
+Subject: [PATCH] Guard wcscpy_s/wcscat_s macros with defined(_MSC_VER)
+
+---
+ libvpl/src/windows/mfx_dispatcher_defs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libvpl/src/windows/mfx_dispatcher_defs.h b/libvpl/src/windows/mfx_dispatcher_defs.h
+index 38fd221..a23f1ce 100644
+--- a/libvpl/src/windows/mfx_dispatcher_defs.h
++++ b/libvpl/src/windows/mfx_dispatcher_defs.h
+@@ -17,7 +17,7 @@
+ #define MAX_PLUGIN_PATH 4096
+ #define MAX_PLUGIN_NAME 4096
+ 
+-#if _MSC_VER < 1400
++#if defined(_MSC_VER) && _MSC_VER < 1400
+     #define wcscpy_s(to, to_size, from) \
+         (void)(to_size);                \
+         wcscpy(to, from)
+-- 
+2.53.0
+
