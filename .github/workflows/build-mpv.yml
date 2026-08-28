@@ -48,7 +48,7 @@ jobs:
       - name: Installing dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y automake autopoint build-essential ccache clang cmake curl gettext git libc++-dev libc++1 libc++abi-dev libc++abi1 libgcrypt-dev libgmp-dev libmimalloc-dev libmpc-dev libmpfr-dev libtool libtool-bin lld llvm nasm ninja-build p7zip-full pkgconf python3-jsonschema python3-mako python3-pip unzip
+          sudo apt-get install -y automake autopoint build-essential ccache clang cmake curl gettext git libc++-dev libc++1 libc++abi-dev libc++abi1 libgmp-dev libmimalloc-dev libmpc-dev libmpfr-dev libtool libtool-bin lld llvm nasm ninja-build p7zip-full pkgconf python3-jsonschema python3-mako python3-pip unzip
           pip3 install --break-system-packages meson
           curl -fsSL --retry 3 -o /tmp/glslang.tar.gz https://github.com/KhronosGroup/glslang/releases/download/main-tot/glslang-main-linux-x86_64-release.tar.gz
           sudo tar -xzf /tmp/glslang.tar.gz -C /usr/local bin/glslang bin/glslangValidator
