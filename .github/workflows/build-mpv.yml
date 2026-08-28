@@ -129,8 +129,12 @@ jobs:
 
       - name: Packaging mpv
         run: |
+          shopt -s nullglob
           mkdir -p release-${{ env.ARCH }}-${{ matrix.x86_64_level }}
-          ninja -C $BUILD_DIR mpv-packaging; mv $BUILD_DIR/mpv*.7z release-${{ env.ARCH }}-${{ matrix.x86_64_level }} || true
+          ninja -C $BUILD_DIR mpv-packaging
+          archives=($BUILD_DIR/mpv*.7z)
+          [ ${#archives[@]} -gt 0 ] || { echo "mpv-packaging produced no archive in $BUILD_DIR" >&2; exit 1; }
+          mv "${archives[@]}" release-${{ env.ARCH }}-${{ matrix.x86_64_level }}/
 
       - name: Recording source revisions
         id: source_revisions
