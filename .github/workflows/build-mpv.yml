@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   build_mpv:
-    name: Building mpv (${{ matrix.llvm_arch }})
+    name: Build mpv (${{ matrix.llvm_arch }})
     runs-on: ubuntu-latest
     outputs:
       cache_date: ${{ steps.cache_date.outputs.value }}
@@ -45,7 +45,7 @@ jobs:
       SYSROOT_LEVEL: v3
       BUILD_DIR: build_x86_64-v3
     steps:
-      - name: Installing dependencies
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y automake autopoint build-essential ccache clang cmake curl gettext git libc++-dev libc++1 libc++abi-dev libc++abi1 libgmp-dev libmimalloc-dev libmpc-dev libmpfr-dev libtool libtool-bin lld llvm nasm ninja-build p7zip-full pkgconf python3-jsonschema python3-mako python3-pip unzip
@@ -54,7 +54,7 @@ jobs:
           sudo tar -xzf /tmp/glslang.tar.gz -C /usr/local bin/glslang bin/glslangValidator
           glslangValidator --version
 
-      - name: Setup git config
+      - name: Configure git
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -71,42 +71,42 @@ jobs:
         id: cache_date
         run: echo "value=$(date -u +'%Y%m%d')" >> $GITHUB_OUTPUT
 
-      - name: Loading clang root cache
-        id: clang_root_cache
+      - name: Load x86_64 toolchain cache
+        id: toolchain_cache
         uses: actions/cache/restore@main
         with:
           path: |
             clang_root
-          key: clang_root-${{ env.ARCH }}-
+          key: ${{ env.ARCH }}_toolchain-
           restore-keys: |
-            clang_root-${{ env.ARCH }}-
+            ${{ env.ARCH }}_toolchain-
           fail-on-cache-miss: true
 
-      - name: Deriving toolchain id
+      - name: Derive toolchain id
         id: toolchain_id
         env:
-          MATCHED_KEY: ${{ steps.clang_root_cache.outputs.cache-matched-key }}
+          MATCHED_KEY: ${{ steps.toolchain_cache.outputs.cache-matched-key }}
         run: |
-          toolchain_id="${MATCHED_KEY#clang_root-$ARCH-}"
+          toolchain_id="${MATCHED_KEY#${ARCH}_toolchain-}"
           echo "value=$toolchain_id" >> $GITHUB_OUTPUT
           echo "PACKAGES_KEY=packages-${{ env.ARCH }}-${{ matrix.x86_64_level }}-$toolchain_id-${{ github.run_id }}" >> $GITHUB_ENV
 
-      - name: Loading sources cache
+      - name: Load sources cache
         uses: actions/cache/restore@main
         with:
           path: src_packages
           key: sources
 
-      - name: Loading x86_64-v3 toolchain sysroot
-        id: toolchain_sysroot
+      - name: Load x86_64-v3 sysroot cache
+        id: sysroot_cache
         uses: actions/cache/restore@main
         with:
           path: |
             ${{ env.BUILD_DIR }}
-          key: clang-${{ env.ARCH }}-${{ env.SYSROOT_LEVEL }}_toolchain-${{ steps.toolchain_id.outputs.value }}
+          key: ${{ env.ARCH }}-${{ env.SYSROOT_LEVEL }}_sysroot-${{ steps.toolchain_id.outputs.value }}
           fail-on-cache-miss: true
 
-      - name: Loading ${{ matrix.x86_64_level }} packages cache
+      - name: Load ${{ matrix.x86_64_level }} packages cache
         id: packages_cache
         uses: actions/cache/restore@main
         with:
@@ -116,18 +116,18 @@ jobs:
           restore-keys: |
             packages-${{ env.ARCH }}-${{ matrix.x86_64_level }}-${{ steps.toolchain_id.outputs.value }}
 
-      - name: Configuring CMake & Downloading source
+      - name: Configure CMake and download sources
         run: |
           cmake -DTARGET_ARCH=$ARCH-w64-mingw32 -DCOMPILER_TOOLCHAIN=clang -DLLVM_ARCH=${{ matrix.llvm_arch }} -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/$BUILD_DIR/$ARCH-${{ env.SYSROOT_LEVEL }}-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -DENABLE_CCACHE=ON -DCLANG_PACKAGES_LTO=ON -DCLANG_FLAGS="${{ matrix.clang_flags }}" -G Ninja --fresh -B $BUILD_DIR -S $PWD
           ninja -C $BUILD_DIR download || true
 
-      - name: Building mpv
+      - name: Build mpv
         id: build_mpv
         run: |
           ninja -C $BUILD_DIR update
           ninja -C $BUILD_DIR mpv
 
-      - name: Packaging mpv
+      - name: Package mpv
         run: |
           shopt -s nullglob
           mkdir -p release-${{ env.ARCH }}-${{ matrix.x86_64_level }}
@@ -136,7 +136,7 @@ jobs:
           [ ${#archives[@]} -gt 0 ] || { echo "mpv-packaging produced no archive in $BUILD_DIR" >&2; exit 1; }
           mv "${archives[@]}" release-${{ env.ARCH }}-${{ matrix.x86_64_level }}/
 
-      - name: Recording source revisions
+      - name: Record source revisions
         id: source_revisions
         run: |
           clang_version=$(./clang_root/bin/clang -dumpversion)
@@ -148,11 +148,11 @@ jobs:
           echo "ffmpeg=$ffmpeg_hash" >> $GITHUB_OUTPUT
           echo "libplacebo=$libplacebo_hash" >> $GITHUB_OUTPUT
 
-      - name: Copying ffmpeg
+      - name: Copy ffmpeg
         run: |
           7z a -m0=lzma2 -mx=9 -ms=on release-${{ env.ARCH }}-${{ matrix.x86_64_level }}/ffmpeg-$ARCH-${{ matrix.x86_64_level }}-git-${{ steps.source_revisions.outputs.ffmpeg }}.7z ./$BUILD_DIR/$ARCH-${{ env.SYSROOT_LEVEL }}-w64-mingw32/bin/ffmpeg.exe
 
-      - name: Collecting logs
+      - name: Collect logs
         if: always()
         env:
           LOGS_DIR: mpv-${{ env.ARCH }}-${{ matrix.x86_64_level }}-logs
@@ -161,7 +161,7 @@ jobs:
           find "$BUILD_DIR" -type f \( -iname "*-*.log" -o -wholename "*/ffbuild/config.log" \) \
             -exec cp -f -t "$LOGS_DIR" {} + || true
 
-      - name: Uploading logs
+      - name: Upload logs
         uses: actions/upload-artifact@master
         if: always()
         with:
@@ -170,7 +170,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 1
 
-      - name: Uploading x86_64-${{ matrix.x86_64_level }} build
+      - name: Upload ${{ matrix.x86_64_level }} build
         uses: actions/upload-artifact@master
         with:
           name: mpv-${{ env.ARCH }}-${{ matrix.x86_64_level }}
@@ -178,18 +178,18 @@ jobs:
           if-no-files-found: error
           compression-level: 0
 
-      - name: Cleaning build directory
+      - name: Clean mpv build state
         if: ${{ always() && steps.build_mpv.conclusion != 'skipped' }}
         run: |
           rm -rf $BUILD_DIR/mpv*
           ninja -C $BUILD_DIR mpv-fullclean
 
-      - name: Cleaning rust toolchain directory
+      - name: Clean cargo cache
         if: ${{ always() && steps.build_mpv.conclusion != 'skipped' }}
         run: |
           ninja -C $BUILD_DIR cargo-clean
 
-      - name: Deleting stale sources cache
+      - name: Delete stale sources cache
         if: ${{ always() && steps.build_mpv.conclusion != 'skipped' && matrix.x86_64_level == env.SYSROOT_LEVEL }}
         env:
           GH_TOKEN: ${{ github.token }}
@@ -197,22 +197,22 @@ jobs:
         run: |
           gh cache delete "sources" --repo "$REPO" || true
 
-      - name: Saving sources cache
+      - name: Save sources cache
         uses: actions/cache/save@main
         if: ${{ always() && steps.build_mpv.conclusion != 'skipped' && matrix.x86_64_level == env.SYSROOT_LEVEL }}
         with:
           path: src_packages
           key: sources
 
-      - name: Saving ${{ matrix.x86_64_level }} packages cache
+      - name: Save ${{ matrix.x86_64_level }} packages cache
         uses: actions/cache/save@main
-        if: ${{ always() && steps.build_mpv.conclusion != 'skipped' && (steps.toolchain_sysroot.outputs.cache-matched-key != '' || steps.packages_cache.outputs.cache-matched-key != '') }}
+        if: ${{ always() && steps.build_mpv.conclusion != 'skipped' && (steps.sysroot_cache.outputs.cache-matched-key != '' || steps.packages_cache.outputs.cache-matched-key != '') }}
         with:
           path: |
             ${{ env.BUILD_DIR }}
           key: ${{ env.PACKAGES_KEY }}
 
-      - name: Deleting superseded ${{ matrix.x86_64_level }} packages caches
+      - name: Delete superseded ${{ matrix.x86_64_level }} packages caches
         if: ${{ always() && steps.build_mpv.conclusion != 'skipped' }}
         env:
           GH_TOKEN: ${{ github.token }}
@@ -225,7 +225,7 @@ jobs:
             gh cache delete "$key" --repo "$REPO" || true
           done
 
-      - name: Saving release cache
+      - name: Save release cache
         uses: actions/cache/save@main
         with:
           path: release-${{ env.ARCH }}-${{ matrix.x86_64_level }}
@@ -242,7 +242,7 @@ jobs:
       RELEASE_V3_KEY: release-x86_64-v3-${{ needs.build_mpv.outputs.cache_date }}-${{ github.run_id }}
       RELEASE_ZNVER3_KEY: release-x86_64-znver3-${{ needs.build_mpv.outputs.cache_date }}-${{ github.run_id }}
     steps:
-      - name: Installing dependencies
+      - name: Install dependencies
         run: |
           sudo apt-get update && sudo apt-get install -y jq
           git config --global pull.rebase true
@@ -253,25 +253,25 @@ jobs:
           ref: master
           fetch-tags: true
 
-      - name: Loading x86_64-v3 release cache
+      - name: Load x86_64-v3 release cache
         uses: actions/cache/restore@main
         with:
           path: release-${{ env.ARCH }}-v3
           key: ${{ env.RELEASE_V3_KEY }}
 
-      - name: Loading x86_64-znver3 release cache
+      - name: Load x86_64-znver3 release cache
         uses: actions/cache/restore@main
         with:
           path: release-${{ env.ARCH }}-znver3
           key: ${{ env.RELEASE_ZNVER3_KEY }}
 
-      - name: Moving archives
+      - name: Move archives
         run: |
           mkdir -p release
           mv release-${{ env.ARCH }}-*/* release || true
           du -ah release/*
 
-      - name: Uploading packages to Github release
+      - name: Upload packages to Github release
         id: upload_packages_gh
         if: ${{ github.event.inputs.github_release == 'true' }}
         continue-on-error: true
@@ -296,7 +296,7 @@ jobs:
           )
           for file in release/*.7z; do curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES --fail-with-body -X POST -H "Accept: application/vnd.github.v3+json" -H "Content-Type: $(file -b --mime-type $file)" https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$id/assets?name=$(basename $file) --data-binary @$file; done
 
-      - name: Pruning tags
+      - name: Prune tags
         continue-on-error: true
         run: |
           # Keep latest 30 tags/releases
@@ -309,7 +309,7 @@ jobs:
           done
           git push origin --delete "${old[@]}"
 
-      - name: Delete releases cache
+      - name: Delete release caches
         if: ${{ github.event.inputs.github_release == 'false' || steps.upload_packages_gh.outcome == 'success' }}
         run: |
           for key in "$RELEASE_V3_KEY" "$RELEASE_ZNVER3_KEY"; do

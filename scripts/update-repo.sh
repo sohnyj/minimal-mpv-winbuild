@@ -9,7 +9,7 @@ set -uo pipefail
 
 usage() { sed -n '2,${/^#/!q;s/^# \?//p}' "$0"; exit "${1:-0}"; }
 
-gitdir=$(cd "$(dirname "$(realpath "$0")")/.." && pwd)
+repo_root=$(cd "$(dirname "$(realpath "$0")")/.." && pwd)
 
 buildroot=""
 while [[ $# -gt 0 ]]; do
@@ -19,7 +19,7 @@ while [[ $# -gt 0 ]]; do
         *)         buildroot="$1"; shift ;;
     esac
 done
-[[ -n "$buildroot" ]] || buildroot="$gitdir"
+[[ -n "$buildroot" ]] || buildroot="$repo_root"
 buildroot=$(cd "$buildroot" && pwd)
 
 shopt -s nullglob
@@ -28,7 +28,7 @@ found=0
 for dir in "$buildroot"/build_x86_64*; do
     [[ -f "$dir/build.ninja" ]] || continue
     found=1
-    echo ">> Updating $(basename "$dir")"
+    echo ">> Update $(basename "$dir")"
     ninja -C "$dir" update || rc=1
 done
 

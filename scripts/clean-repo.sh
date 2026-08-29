@@ -10,7 +10,7 @@ set -uo pipefail
 
 usage() { sed -n '2,${/^#/!q;s/^# \?//p}' "$0"; exit "${1:-0}"; }
 
-gitdir=$(cd "$(dirname "$(realpath "$0")")/.." && pwd)
+repo_root=$(cd "$(dirname "$(realpath "$0")")/.." && pwd)
 
 buildroot=""
 pkgs=()
@@ -23,7 +23,7 @@ while [[ $# -gt 0 ]]; do
         *)         buildroot="$1"; shift ;;
     esac
 done
-[[ -n "$buildroot" ]] || buildroot="$gitdir"
+[[ -n "$buildroot" ]] || buildroot="$repo_root"
 buildroot=$(cd "$buildroot" && pwd)
 
 src_packages="$buildroot/src_packages"
@@ -49,7 +49,7 @@ pkgs=("${filtered[@]}")
 
 rc=0
 for pkg in "${pkgs[@]}"; do
-    echo ">> Cleaning $pkg"
+    echo ">> Clean $pkg"
     hit=0
     for dir in "$buildroot"/build_x86_64*; do
         [[ -f "$dir/build.ninja" ]] || continue

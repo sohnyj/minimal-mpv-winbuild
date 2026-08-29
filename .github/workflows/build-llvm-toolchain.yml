@@ -22,16 +22,16 @@ concurrency:
 
 jobs:
   build_llvm:
-    name: Building LLVM and Clang
+    name: Build LLVM and Clang
     runs-on: ubuntu-latest
     steps:
-      - name: Installing dependencies
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y automake autopoint build-essential ccache clang cmake curl gettext git libc++-dev libc++1 libc++abi-dev libc++abi1 libgmp-dev libmimalloc-dev libmpc-dev libmpfr-dev libtool libtool-bin lld llvm nasm ninja-build p7zip-full pkgconf python3-jsonschema python3-mako python3-pip unzip
           pip3 install --break-system-packages meson
 
-      - name: Setup git config
+      - name: Configure git
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -48,82 +48,82 @@ jobs:
         id: cache_date
         run: echo "value=$(date -u +'%Y%m%d')" >> $GITHUB_OUTPUT
 
-      - name: Loading clang root
-        id: clang_root_cache
+      - name: Load x86_64 toolchain cache
+        id: toolchain_cache
         if: ${{ github.event.inputs.fresh_build != 'true' }}
         uses: actions/cache/restore@main
         with:
           path: clang_root
-          key: clang_root-x86_64-
+          key: x86_64_toolchain-
           restore-keys: |
-            clang_root-x86_64-
+            x86_64_toolchain-
 
-      - name: Loading x86_64 toolchain
-        id: x86_64_toolchain_cache
+      - name: Load x86_64 sysroot cache
+        id: x86_64_sysroot_cache
         if: ${{ github.event.inputs.fresh_build != 'true' }}
         uses: actions/cache/restore@main
         with:
           path: build_x86_64
-          key: clang-x86_64_toolchain-
+          key: x86_64_sysroot-
           restore-keys: |
-            clang-x86_64_toolchain-
+            x86_64_sysroot-
 
-      - name: Loading x86_64-v3 toolchain
-        id: x86_64-v3_toolchain_cache
+      - name: Load x86_64-v3 sysroot cache
+        id: x86_64-v3_sysroot_cache
         if: ${{ github.event.inputs.fresh_build != 'true' }}
         uses: actions/cache/restore@main
         with:
           path: build_x86_64-v3
-          key: clang-x86_64-v3_toolchain-
+          key: x86_64-v3_sysroot-
           restore-keys: |
-            clang-x86_64-v3_toolchain-
+            x86_64-v3_sysroot-
 
-      - name: Deriving cache suffix
-        id: cache_suffix
+      - name: Derive toolchain id
+        id: toolchain_id
         env:
-          CLANG_ROOT_KEY: ${{ steps.clang_root_cache.outputs.cache-matched-key }}
-          X86_64_TOOLCHAIN_KEY: ${{ steps.x86_64_toolchain_cache.outputs.cache-matched-key }}
-          X86_64_V3_TOOLCHAIN_KEY: ${{ steps.x86_64-v3_toolchain_cache.outputs.cache-matched-key }}
+          TOOLCHAIN_KEY: ${{ steps.toolchain_cache.outputs.cache-matched-key }}
+          X86_64_SYSROOT_KEY: ${{ steps.x86_64_sysroot_cache.outputs.cache-matched-key }}
+          X86_64_V3_SYSROOT_KEY: ${{ steps.x86_64-v3_sysroot_cache.outputs.cache-matched-key }}
           FRESH: ${{ steps.cache_date.outputs.value }}-${{ github.run_id }}
         run: |
-          if [ -n "$CLANG_ROOT_KEY" ] && [ -n "$X86_64_TOOLCHAIN_KEY" ] && [ -n "$X86_64_V3_TOOLCHAIN_KEY" ]; then
-            echo "value=${CLANG_ROOT_KEY#clang_root-x86_64-}" >> $GITHUB_OUTPUT
+          if [ -n "$TOOLCHAIN_KEY" ] && [ -n "$X86_64_SYSROOT_KEY" ] && [ -n "$X86_64_V3_SYSROOT_KEY" ]; then
+            echo "value=${TOOLCHAIN_KEY#x86_64_toolchain-}" >> $GITHUB_OUTPUT
             echo "rebuilt=false" >> $GITHUB_OUTPUT
           else
             echo "value=$FRESH" >> $GITHUB_OUTPUT
             echo "rebuilt=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Building LLVM with IR Profile Instrumentation
-        if: ${{ steps.clang_root_cache.outputs.cache-matched-key == '' }}
+      - name: Build LLVM with PGO instrumentation
+        if: ${{ steps.toolchain_cache.outputs.cache-matched-key == '' }}
         run: |
           cmake -DTARGET_ARCH=x86_64-w64-mingw32 -DLLVM_ENABLE_PGO=GEN -DCOMPILER_TOOLCHAIN=clang -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/build_x86_64/x86_64-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -G Ninja -B build_x86_64 -S $PWD
           ninja -C build_x86_64 llvm
           ninja -C build_x86_64 rustup
           ninja -C build_x86_64 cargo-clean
 
-      - name: Building x86_64 toolchain
-        if: ${{ steps.x86_64_toolchain_cache.outputs.cache-matched-key == ''
-             || steps.clang_root_cache.outputs.cache-matched-key == '' }}
+      - name: Build x86_64 sysroot
+        if: ${{ steps.x86_64_sysroot_cache.outputs.cache-matched-key == ''
+             || steps.toolchain_cache.outputs.cache-matched-key == '' }}
         run: |
           cmake -DTARGET_ARCH=x86_64-w64-mingw32 -DLLVM_ENABLE_PGO=GEN -DCOMPILER_TOOLCHAIN=clang -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/build_x86_64/x86_64-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -G Ninja -B build_x86_64 -S $PWD
           ninja -C build_x86_64 llvm-clang
 
-      - name: Building x86_64-v3 toolchain
-        if: ${{ steps.x86_64-v3_toolchain_cache.outputs.cache-matched-key == ''
-             || steps.clang_root_cache.outputs.cache-matched-key == '' }}
+      - name: Build x86_64-v3 sysroot
+        if: ${{ steps.x86_64-v3_sysroot_cache.outputs.cache-matched-key == ''
+             || steps.toolchain_cache.outputs.cache-matched-key == '' }}
         run: |
           cmake -DTARGET_ARCH=x86_64-w64-mingw32 -DCOMPILER_TOOLCHAIN=clang -DLLVM_ARCH=x86-64-v3 -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/build_x86_64-v3/x86_64-v3-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -G Ninja -B build_x86_64-v3 -S $PWD
           ninja -C build_x86_64-v3 llvm-clang
 
-      - name: PGO training with shaderc
-        if: ${{ steps.clang_root_cache.outputs.cache-matched-key == '' }}
+      - name: Train PGO with shaderc
+        if: ${{ steps.toolchain_cache.outputs.cache-matched-key == '' }}
         run: |
           cmake -DTARGET_ARCH=x86_64-w64-mingw32 -DLLVM_ENABLE_PGO=GEN -DCLANG_PACKAGES_LTO=ON -DCOMPILER_TOOLCHAIN=clang -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/build_x86_64/x86_64-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -G Ninja -B build_x86_64 -S $PWD
           ninja -C build_x86_64 shaderc
 
-      - name: Merging profraw to profdata
-        if: ${{ steps.clang_root_cache.outputs.cache-matched-key == '' }}
+      - name: Merge profraw to profdata
+        if: ${{ steps.toolchain_cache.outputs.cache-matched-key == '' }}
         run: |
           shopt -s nullglob
           profraw=("$PWD"/clang_root/profiles/*.profraw)
@@ -131,70 +131,70 @@ jobs:
           llvm-profdata merge "${profraw[@]}" -o llvm.profdata
           rm -rf "$PWD"/clang_root/profiles/* || true
 
-      - name: Building LLVM with PGO
-        if: ${{ steps.clang_root_cache.outputs.cache-matched-key == '' }}
+      - name: Build LLVM with PGO
+        if: ${{ steps.toolchain_cache.outputs.cache-matched-key == '' }}
         run: |
           cmake -DTARGET_ARCH=x86_64-w64-mingw32 -DLLVM_ENABLE_PGO=USE -DLLVM_PROFDATA_FILE="llvm.profdata" -DCOMPILER_TOOLCHAIN=clang -DCMAKE_INSTALL_PREFIX=$PWD/clang_root -DMINGW_INSTALL_PREFIX=$PWD/build_x86_64/x86_64-w64-mingw32 -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -G Ninja -B build_x86_64 -S $PWD
           ninja -C build_x86_64 llvm
 
-      - name: Collecting logs
+      - name: Collect logs
         if: always()
         run: |
-          mkdir -p llvm-x86_64-logs llvm-x86_64-v3-logs
-          find build_x86_64 -type f -iname "*-*.log" -exec cp -f -t llvm-x86_64-logs {} + || true
-          find build_x86_64-v3 -type f -iname "*-*.log" -exec cp -f -t llvm-x86_64-v3-logs {} + || true
+          mkdir -p toolchain-x86_64-logs sysroot-x86_64-v3-logs
+          find build_x86_64 -type f -iname "*-*.log" -exec cp -f -t toolchain-x86_64-logs {} + || true
+          find build_x86_64-v3 -type f -iname "*-*.log" -exec cp -f -t sysroot-x86_64-v3-logs {} + || true
 
-      - name: Deleting build state
+      - name: Delete build state
         run: |
           rm -rf {build_x86_64,build_x86_64-v3}/{toolchain,packages} || true
 
-      - name: Uploading x86_64 logs
+      - name: Upload x86_64 toolchain logs
         uses: actions/upload-artifact@master
         if: always()
         with:
-          name: llvm-x86_64-logs
-          path: llvm-x86_64-logs
+          name: toolchain-x86_64-logs
+          path: toolchain-x86_64-logs
           if-no-files-found: ignore
           retention-days: 1
 
-      - name: Uploading x86_64-v3 logs
+      - name: Upload x86_64-v3 sysroot logs
         uses: actions/upload-artifact@master
         if: always()
         with:
-          name: llvm-x86_64-v3-logs
-          path: llvm-x86_64-v3-logs
+          name: sysroot-x86_64-v3-logs
+          path: sysroot-x86_64-v3-logs
           if-no-files-found: ignore
           retention-days: 1
 
-      - name: Saving clang root
+      - name: Save x86_64 toolchain cache
         uses: actions/cache/save@main
-        if: ${{ steps.cache_suffix.outputs.rebuilt == 'true' }}
+        if: ${{ steps.toolchain_id.outputs.rebuilt == 'true' }}
         with:
           path: clang_root
-          key: clang_root-x86_64-${{ steps.cache_suffix.outputs.value }}
+          key: x86_64_toolchain-${{ steps.toolchain_id.outputs.value }}
 
-      - name: Saving x86_64 toolchain
+      - name: Save x86_64 sysroot cache
         uses: actions/cache/save@main
-        if: ${{ steps.cache_suffix.outputs.rebuilt == 'true' }}
+        if: ${{ steps.toolchain_id.outputs.rebuilt == 'true' }}
         with:
           path: build_x86_64
-          key: clang-x86_64_toolchain-${{ steps.cache_suffix.outputs.value }}
+          key: x86_64_sysroot-${{ steps.toolchain_id.outputs.value }}
 
-      - name: Saving x86_64-v3 toolchain
+      - name: Save x86_64-v3 sysroot cache
         uses: actions/cache/save@main
-        if: ${{ steps.cache_suffix.outputs.rebuilt == 'true' }}
+        if: ${{ steps.toolchain_id.outputs.rebuilt == 'true' }}
         with:
           path: build_x86_64-v3
-          key: clang-x86_64-v3_toolchain-${{ steps.cache_suffix.outputs.value }}
+          key: x86_64-v3_sysroot-${{ steps.toolchain_id.outputs.value }}
 
-      - name: Deleting superseded toolchain caches
-        if: ${{ steps.cache_suffix.outputs.rebuilt == 'true' }}
+      - name: Delete superseded toolchain and sysroot caches
+        if: ${{ steps.toolchain_id.outputs.rebuilt == 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          KEEP: ${{ steps.cache_suffix.outputs.value }}
+          KEEP: ${{ steps.toolchain_id.outputs.value }}
         run: |
-          for prefix in clang_root-x86_64- clang-x86_64_toolchain- clang-x86_64-v3_toolchain-; do
+          for prefix in x86_64_toolchain- x86_64_sysroot- x86_64-v3_sysroot-; do
             gh cache list --repo "$REPO" --key "${prefix}${KEEP}" --json key --jq '.[].key' | grep -qx "${prefix}${KEEP}" || continue
             for key in $(gh cache list --repo "$REPO" --key "$prefix" --json key --limit 100 --jq '.[].key'); do
               [ "$key" = "${prefix}${KEEP}" ] && continue
@@ -203,14 +203,14 @@ jobs:
           done
 
   call_workflow:
-    name: Run build-mpv
+    name: Dispatch build-mpv
     runs-on: ubuntu-latest
     needs: build_llvm
     env:
       GH_TOKEN: ${{ github.token }}
       CURL_RETRIES: "--connect-timeout 60 --retry 999 --retry-delay 5 --retry-all-errors"
     steps:
-      - name: Run build-mpv.yml
+      - name: Dispatch build-mpv.yml
         run: |
           curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES --fail-with-body -X POST -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/build-mpv.yml/dispatches -d @- <<EOF
           {

@@ -11,7 +11,7 @@ shopt -s nullglob
 
 usage() { sed -n '2,${/^#/!q;s/^# \?//p}' "$0"; exit "${1:-0}"; }
 
-gitdir=$(cd "$(dirname "$(realpath "$0")")/.." && pwd)
+repo_root=$(cd "$(dirname "$(realpath "$0")")/.." && pwd)
 
 march="x86-64-v3"
 buildroot=""
@@ -24,7 +24,7 @@ while [[ $# -gt 0 ]]; do
         *)         buildroot="$1"; shift ;;
     esac
 done
-[[ -n "$buildroot" ]] || buildroot="$gitdir"
+[[ -n "$buildroot" ]] || buildroot="$repo_root"
 mkdir -p "$buildroot"
 buildroot=$(cd "$buildroot" && pwd)
 
@@ -43,7 +43,7 @@ arch_dir="$buildroot/build_x86_64$x86_64_level"
 clang_root="$buildroot/clang_root"
 profdata="$buildroot/llvm.profdata"
 
-echo ">> Wiping build dirs + clang_root for a from-scratch rebuild"
+echo ">> Wipe build dirs + clang_root for a from-scratch rebuild"
 rm -rf "$host_dir" "$arch_dir" "$clang_root" "$profdata"
 
 common=(
@@ -53,25 +53,25 @@ common=(
     -DSINGLE_SOURCE_LOCATION="$buildroot/src_packages"
     -DRUSTUP_LOCATION="$clang_root/install_rustup"
     -G Ninja
-    -S "$gitdir"
+    -S "$repo_root"
 )
 
-src_packages=(llvm mingw-w64 cppwinrt)
+toolchain_pkgs=(llvm mingw-w64 cppwinrt)
 
 refresh_sources() { # $1 = build dir exposing the <pkg>-force-update targets
     local dir=$1 pkg targets=() names=()
-    for pkg in "${src_packages[@]}"; do
+    for pkg in "${toolchain_pkgs[@]}"; do
         if [[ -d "$buildroot/src_packages/$pkg/.git" ]]; then
             targets+=("$pkg-force-update"); names+=("$pkg")
         fi
     done
     if [[ ${#targets[@]} -gt 0 ]]; then
-        echo ">> Fast-forwarding toolchain sources: ${names[*]}"
+        echo ">> Fast-forward toolchain sources: ${names[*]}"
         ninja -C "$dir" "${targets[@]}"
     fi
 }
 
-echo ">> [1/6] Build LLVM with PGO"
+echo ">> [1/6] Build LLVM with PGO instrumentation"
 cmake "${common[@]}" -DLLVM_ENABLE_PGO=GEN \
     -DMINGW_INSTALL_PREFIX="$host_dir/x86_64-w64-mingw32" -B "$host_dir"
 refresh_sources "$host_dir"
@@ -79,16 +79,16 @@ ninja -C "$host_dir" llvm
 ninja -C "$host_dir" rustup
 ninja -C "$host_dir" cargo-clean
 
-echo ">> [2/6] Build x86_64 cross toolchain"
+echo ">> [2/6] Build x86_64 sysroot"
 ninja -C "$host_dir" llvm-clang
 
 if [[ -n "$x86_64_level" ]]; then
-    echo ">> [3/6] Build $march cross toolchain"
+    echo ">> [3/6] Build $march sysroot"
     cmake "${common[@]}" -DLLVM_ARCH="$march" \
         -DMINGW_INSTALL_PREFIX="$arch_dir/x86_64$x86_64_level-w64-mingw32" -B "$arch_dir"
     ninja -C "$arch_dir" llvm-clang
 else
-    echo ">> [3/6] skipped ($march is the base toolchain)"
+    echo ">> [3/6] skipped ($march is the base sysroot)"
 fi
 
 echo ">> [4/6] Train PGO with shaderc"
@@ -107,4 +107,4 @@ cmake "${common[@]}" -DLLVM_ENABLE_PGO=USE -DLLVM_PROFDATA_FILE="$profdata" \
     -DMINGW_INSTALL_PREFIX="$host_dir/x86_64-w64-mingw32" -B "$host_dir"
 ninja -C "$host_dir" llvm
 
-echo ">> Toolchain: $clang_root (arch sysroot: $arch_dir)"
+echo ">> Toolchain: $clang_root (sysroot: $arch_dir/x86_64$x86_64_level-w64-mingw32)"

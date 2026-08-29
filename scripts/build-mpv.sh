@@ -12,7 +12,7 @@ shopt -s nullglob
 
 usage() { sed -n '2,${/^#/!q;s/^# \?//p}' "$0"; exit "${1:-0}"; }
 
-gitdir=$(cd "$(dirname "$(realpath "$0")")/.." && pwd)
+repo_root=$(cd "$(dirname "$(realpath "$0")")/.." && pwd)
 
 march="x86-64-v3"
 mtune=""
@@ -28,7 +28,7 @@ while [[ $# -gt 0 ]]; do
         *)         buildroot="$1"; shift ;;
     esac
 done
-[[ -n "$buildroot" ]] || buildroot="$gitdir"
+[[ -n "$buildroot" ]] || buildroot="$repo_root"
 mkdir -p "$buildroot"
 buildroot=$(cd "$buildroot" && pwd)
 
@@ -60,7 +60,7 @@ fi
 clang_flags=""
 if [[ -n "$mtune" ]]; then clang_flags="-mtune=$mtune"; fi
 
-echo ">> [1/6] Configuring mpv ($march${mtune:+, -mtune=$mtune}) in $arch_dir"
+echo ">> [1/6] Configure mpv ($march${mtune:+, -mtune=$mtune}) in $arch_dir"
 cmake \
     -DTARGET_ARCH=x86_64-w64-mingw32 \
     -DCOMPILER_TOOLCHAIN=clang \
@@ -72,18 +72,18 @@ cmake \
     -DENABLE_CCACHE=ON \
     -DCLANG_PACKAGES_LTO=ON \
     -DCLANG_FLAGS="$clang_flags" \
-    -G Ninja --fresh -B "$arch_dir" -S "$gitdir"
+    -G Ninja --fresh -B "$arch_dir" -S "$repo_root"
 
-echo ">> [2/6] Downloading sources"
+echo ">> [2/6] Download sources"
 ninja -C "$arch_dir" download || true
 
-echo ">> [3/6] Updating git packages"
+echo ">> [3/6] Update git packages"
 ninja -C "$arch_dir" update
 
-echo ">> [4/6] Building mpv"
+echo ">> [4/6] Build mpv"
 ninja -C "$arch_dir" mpv
 
-echo ">> [5/6] Packaging mpv"
+echo ">> [5/6] Package mpv"
 mkdir -p "$release_dir"
 ninja -C "$arch_dir" mpv-packaging
 archives=("$arch_dir"/mpv*.7z)
@@ -95,7 +95,7 @@ ffmpeg_hash=$(git -C "$buildroot/src_packages/ffmpeg" rev-parse --short HEAD)
     "$release_dir/ffmpeg-x86_64$x86_64_level-git-$ffmpeg_hash.7z" \
     "$mingw_prefix/bin/ffmpeg.exe"
 
-echo ">> [6/6] Cleaning Rust build artifacts"
+echo ">> [6/6] Clean cargo cache"
 ninja -C "$arch_dir" cargo-clean
 
 echo ">> Artifacts: $release_dir"
