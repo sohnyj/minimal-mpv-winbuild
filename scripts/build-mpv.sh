@@ -42,61 +42,64 @@ else
     x86_64_level=""
 fi
 
-arch_dir="$buildroot/build_x86_64$x86_64_level"
-mingw_prefix="$arch_dir/x86_64$x86_64_level-w64-mingw32"
+march_dir="$buildroot/build_x86_64$x86_64_level"
+sysroot="$march_dir/x86_64$x86_64_level-w64-mingw32"
 clang_root="$buildroot/clang_root"
 release_dir="$buildroot/release"
 
-if [[ ! -x "$clang_root/bin/clang" ]]; then
-    echo "toolchain not found at $clang_root/bin/clang -- run build-llvm.sh first" >&2
+if [[ ! -d "$sysroot/include" || ! -d "$sysroot/lib" ]]; then
+    echo "Sysroot not found at $sysroot -- run build-llvm.sh first" >&2
     exit 1
 fi
 
-if [[ ! -d "$mingw_prefix/include" || ! -d "$mingw_prefix/lib" ]]; then
-    echo "sysroot not found at $mingw_prefix -- run build-llvm.sh first" >&2
+if [[ ! -x "$clang_root/bin/clang" ]]; then
+    echo "Toolchain not found at $clang_root/bin/clang -- run build-llvm.sh first" >&2
     exit 1
 fi
 
 clang_flags=""
 if [[ -n "$mtune" ]]; then clang_flags="-mtune=$mtune"; fi
 
-echo ">> [1/6] Configure mpv ($march${mtune:+, -mtune=$mtune}) in $arch_dir"
+echo ">> [1/6] Configure mpv ($march${mtune:+, -mtune=$mtune}) in $march_dir"
 cmake \
     -DTARGET_ARCH=x86_64-w64-mingw32 \
     -DCOMPILER_TOOLCHAIN=clang \
     -DLLVM_ARCH="$march" \
     -DCMAKE_INSTALL_PREFIX="$clang_root" \
-    -DMINGW_INSTALL_PREFIX="$mingw_prefix" \
+    -DMINGW_INSTALL_PREFIX="$sysroot" \
     -DSINGLE_SOURCE_LOCATION="$buildroot/src_packages" \
     -DRUSTUP_LOCATION="$clang_root/install_rustup" \
     -DENABLE_CCACHE=ON \
     -DCLANG_PACKAGES_LTO=ON \
     -DCLANG_FLAGS="$clang_flags" \
-    -G Ninja --fresh -B "$arch_dir" -S "$repo_root"
+    -G Ninja --fresh -B "$march_dir" -S "$repo_root"
 
 echo ">> [2/6] Download sources"
-ninja -C "$arch_dir" download || true
+ninja -C "$march_dir" download || true
 
 echo ">> [3/6] Update git packages"
-ninja -C "$arch_dir" update
+ninja -C "$march_dir" update
 
 echo ">> [4/6] Build mpv"
-ninja -C "$arch_dir" mpv
+ninja -C "$march_dir" mpv
 
 echo ">> [5/6] Package mpv"
 mkdir -p "$release_dir"
-ninja -C "$arch_dir" mpv-packaging
-archives=("$arch_dir"/mpv*.7z)
-[[ ${#archives[@]} -gt 0 ]] || { echo "mpv-packaging produced no archive in $arch_dir" >&2; exit 1; }
+ninja -C "$march_dir" mpv-packaging
+archives=("$march_dir"/mpv*.7z)
+[[ ${#archives[@]} -gt 0 ]] || { echo "mpv-packaging produced no archive in $march_dir" >&2; exit 1; }
 mv "${archives[@]}" "$release_dir"/
+produced=("${archives[@]##*/}")
 
 ffmpeg_hash=$(git -C "$buildroot/src_packages/ffmpeg" rev-parse --short HEAD)
+ffmpeg_archive="ffmpeg-x86_64$x86_64_level-git-$ffmpeg_hash.7z"
 7z a -m0=lzma2 -mx=9 -ms=on \
-    "$release_dir/ffmpeg-x86_64$x86_64_level-git-$ffmpeg_hash.7z" \
-    "$mingw_prefix/bin/ffmpeg.exe"
+    "$release_dir/$ffmpeg_archive" \
+    "$sysroot/bin/ffmpeg.exe"
+produced+=("$ffmpeg_archive")
 
 echo ">> [6/6] Clean cargo cache"
-ninja -C "$arch_dir" cargo-clean
+ninja -C "$march_dir" cargo-clean
 
 echo ">> Artifacts: $release_dir"
-ls -1 "$release_dir"
+printf '%s\n' "${produced[@]}"

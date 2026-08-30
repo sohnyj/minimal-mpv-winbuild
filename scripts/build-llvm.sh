@@ -38,15 +38,15 @@ else
     x86_64_level=""
 fi
 
-host_dir="$buildroot/build_x86_64"
-arch_dir="$buildroot/build_x86_64$x86_64_level"
+base_dir="$buildroot/build_x86_64"
+march_dir="$buildroot/build_x86_64$x86_64_level"
 clang_root="$buildroot/clang_root"
 profdata="$buildroot/llvm.profdata"
 
 echo ">> Wipe build dirs + clang_root for a from-scratch rebuild"
-rm -rf "$host_dir" "$arch_dir" "$clang_root" "$profdata"
+rm -rf "$base_dir" "$march_dir" "$clang_root" "$profdata"
 
-common=(
+cmake_args=(
     -DTARGET_ARCH=x86_64-w64-mingw32
     -DCOMPILER_TOOLCHAIN=clang
     -DCMAKE_INSTALL_PREFIX="$clang_root"
@@ -72,29 +72,29 @@ refresh_sources() { # $1 = build dir exposing the <pkg>-force-update targets
 }
 
 echo ">> [1/6] Build LLVM with PGO instrumentation"
-cmake "${common[@]}" -DLLVM_ENABLE_PGO=GEN \
-    -DMINGW_INSTALL_PREFIX="$host_dir/x86_64-w64-mingw32" -B "$host_dir"
-refresh_sources "$host_dir"
-ninja -C "$host_dir" llvm
-ninja -C "$host_dir" rustup
-ninja -C "$host_dir" cargo-clean
+cmake "${cmake_args[@]}" -DLLVM_ENABLE_PGO=GEN \
+    -DMINGW_INSTALL_PREFIX="$base_dir/x86_64-w64-mingw32" -B "$base_dir"
+refresh_sources "$base_dir"
+ninja -C "$base_dir" llvm
+ninja -C "$base_dir" rustup
+ninja -C "$base_dir" cargo-clean
 
 echo ">> [2/6] Build x86_64 sysroot"
-ninja -C "$host_dir" llvm-clang
+ninja -C "$base_dir" llvm-clang
 
 if [[ -n "$x86_64_level" ]]; then
     echo ">> [3/6] Build $march sysroot"
-    cmake "${common[@]}" -DLLVM_ARCH="$march" \
-        -DMINGW_INSTALL_PREFIX="$arch_dir/x86_64$x86_64_level-w64-mingw32" -B "$arch_dir"
-    ninja -C "$arch_dir" llvm-clang
+    cmake "${cmake_args[@]}" -DLLVM_ARCH="$march" \
+        -DMINGW_INSTALL_PREFIX="$march_dir/x86_64$x86_64_level-w64-mingw32" -B "$march_dir"
+    ninja -C "$march_dir" llvm-clang
 else
     echo ">> [3/6] skipped ($march is the base sysroot)"
 fi
 
 echo ">> [4/6] Train PGO with shaderc"
-cmake "${common[@]}" -DLLVM_ENABLE_PGO=GEN -DCLANG_PACKAGES_LTO=ON \
-    -DMINGW_INSTALL_PREFIX="$host_dir/x86_64-w64-mingw32" -B "$host_dir"
-ninja -C "$host_dir" shaderc
+cmake "${cmake_args[@]}" -DLLVM_ENABLE_PGO=GEN -DCLANG_PACKAGES_LTO=ON \
+    -DMINGW_INSTALL_PREFIX="$base_dir/x86_64-w64-mingw32" -B "$base_dir"
+ninja -C "$base_dir" shaderc
 
 echo ">> [5/6] Merge profraw -> $profdata"
 profraw=("$clang_root"/profiles/*.profraw)
@@ -103,8 +103,9 @@ llvm-profdata merge "${profraw[@]}" -o "$profdata"
 rm -rf "$clang_root"/profiles/* || true
 
 echo ">> [6/6] Rebuild LLVM with PGO"
-cmake "${common[@]}" -DLLVM_ENABLE_PGO=USE -DLLVM_PROFDATA_FILE="$profdata" \
-    -DMINGW_INSTALL_PREFIX="$host_dir/x86_64-w64-mingw32" -B "$host_dir"
-ninja -C "$host_dir" llvm
+cmake "${cmake_args[@]}" -DLLVM_ENABLE_PGO=USE -DLLVM_PROFDATA_FILE="$profdata" \
+    -DMINGW_INSTALL_PREFIX="$base_dir/x86_64-w64-mingw32" -B "$base_dir"
+ninja -C "$base_dir" llvm
 
-echo ">> Toolchain: $clang_root (sysroot: $arch_dir/x86_64$x86_64_level-w64-mingw32)"
+echo ">> Sysroot: $march_dir/x86_64$x86_64_level-w64-mingw32"
+echo ">> Toolchain: $clang_root"
