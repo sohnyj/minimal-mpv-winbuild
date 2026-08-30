@@ -1,11 +1,11 @@
 #!/bin/bash
 # Build and package mpv for a target arch.
-# Requires the toolchain from build-llvm.sh. Packaged .7z artifacts land in release/.
+# Requires the toolchain from build-llvm.sh. Packaged .7z artifacts are written to release/.
 #
 # Usage: build-mpv.sh [--march <arch>] [--mtune <cpu>] [buildroot]
 #   --march <arch>  LLVM target arch (default: x86-64-v3; e.g. znver3, x86-64)
 #   --mtune <cpu>   -mtune for package builds via CLANG_FLAGS (default: none)
-#   buildroot       where clang_root/src_packages/build dirs live
+#   buildroot       location of the clang_root/src_packages/build dirs
 #                   (default: the repository root)
 set -euo pipefail
 shopt -s nullglob
@@ -24,7 +24,7 @@ while [[ $# -gt 0 ]]; do
         --mtune)   mtune="$2"; shift 2 ;;
         --mtune=*) mtune="${1#*=}"; shift ;;
         -h|--help) usage 0 ;;
-        -*)        echo "unknown option: $1" >&2; usage 1 ;;
+        -*)        echo "Unknown option: $1" >&2; usage 1 ;;
         *)         buildroot="$1"; shift ;;
     esac
 done
@@ -87,7 +87,7 @@ echo ">> [5/6] Package mpv"
 mkdir -p "$release_dir"
 ninja -C "$march_dir" mpv-packaging
 archives=("$march_dir"/mpv*.7z)
-[[ ${#archives[@]} -gt 0 ]] || { echo "mpv-packaging produced no archive in $march_dir" >&2; exit 1; }
+[[ ${#archives[@]} -gt 0 ]] || { echo "No archive from mpv-packaging in $march_dir" >&2; exit 1; }
 mv "${archives[@]}" "$release_dir"/
 produced=("${archives[@]##*/}")
 

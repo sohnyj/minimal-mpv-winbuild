@@ -1,5 +1,5 @@
 #!/bin/bash
-# Force-update git-based package sources. Runs `ninja update`
+# Update git-based package sources. Runs `ninja update`
 # in every configured build_x86_64* dir.
 #
 # Usage: update-repo.sh [buildroot]
@@ -15,11 +15,12 @@ buildroot=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -h|--help) usage 0 ;;
-        -*)        echo "unknown option: $1" >&2; usage 1 ;;
+        -*)        echo "Unknown option: $1" >&2; usage 1 ;;
         *)         buildroot="$1"; shift ;;
     esac
 done
 [[ -n "$buildroot" ]] || buildroot="$repo_root"
+[[ -d "$buildroot" ]] || { echo "No such directory: $buildroot" >&2; exit 1; }
 buildroot=$(cd "$buildroot" && pwd)
 
 shopt -s nullglob

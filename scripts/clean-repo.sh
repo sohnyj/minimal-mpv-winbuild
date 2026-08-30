@@ -4,7 +4,7 @@
 #
 # Usage: clean-repo.sh [-p pkg]... [buildroot]
 #   -p, --pkg pkg  package to clean (repeatable; default: every git source clone)
-#   buildroot      where src_packages/build dirs live
+#   buildroot      location of the src_packages/build dirs
 #                  (default: the repository root)
 set -uo pipefail
 
@@ -19,11 +19,12 @@ while [[ $# -gt 0 ]]; do
         -p|--pkg)  pkgs+=("$2"); shift 2 ;;
         --pkg=*)   pkgs+=("${1#*=}"); shift ;;
         -h|--help) usage 0 ;;
-        -*)        echo "unknown option: $1" >&2; usage 1 ;;
+        -*)        echo "Unknown option: $1" >&2; usage 1 ;;
         *)         buildroot="$1"; shift ;;
     esac
 done
 [[ -n "$buildroot" ]] || buildroot="$repo_root"
+[[ -d "$buildroot" ]] || { echo "No such directory: $buildroot" >&2; exit 1; }
 buildroot=$(cd "$buildroot" && pwd)
 
 src_packages="$buildroot/src_packages"
@@ -47,17 +48,19 @@ done
 [[ ${#filtered[@]} -gt 0 ]] || { echo "Nothing to clean under $src_packages" >&2; exit 1; }
 pkgs=("${filtered[@]}")
 
+build_dirs=()
+for dir in "$buildroot"/build_x86_64*; do
+    [[ -f "$dir/build.ninja" ]] && build_dirs+=("$dir")
+done
+[[ ${#build_dirs[@]} -gt 0 ]] || { echo "No configured build_x86_64* dir under $buildroot" >&2; exit 1; }
+
 rc=0
 for pkg in "${pkgs[@]}"; do
     echo ">> Clean $pkg"
-    hit=0
-    for dir in "$buildroot"/build_x86_64*; do
-        [[ -f "$dir/build.ninja" ]] || continue
+    for dir in "${build_dirs[@]}"; do
         ninja -C "$dir" "$pkg-fullclean" || true
         ninja -C "$dir" "$pkg-removeprefix" || rc=1
-        hit=1
     done
-    [[ $hit -eq 1 ]] || echo ">> no configured build_x86_64* dir found"
 done
 
 echo ">> Done."

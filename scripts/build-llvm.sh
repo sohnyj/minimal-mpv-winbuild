@@ -4,7 +4,7 @@
 #
 # Usage: build-llvm.sh [--march <arch>] [buildroot]
 #   --march <arch>  LLVM target arch (default: x86-64-v3; e.g. znver3, x86-64)
-#   buildroot       where clang_root/src_packages/build dirs live
+#   buildroot       location of the clang_root/src_packages/build dirs
 #                   (default: the repository root)
 set -euo pipefail
 shopt -s nullglob
@@ -20,7 +20,7 @@ while [[ $# -gt 0 ]]; do
         --march)   march="$2"; shift 2 ;;
         --march=*) march="${1#*=}"; shift ;;
         -h|--help) usage 0 ;;
-        -*)        echo "unknown option: $1" >&2; usage 1 ;;
+        -*)        echo "Unknown option: $1" >&2; usage 1 ;;
         *)         buildroot="$1"; shift ;;
     esac
 done
@@ -58,7 +58,7 @@ cmake_args=(
 
 toolchain_pkgs=(llvm mingw-w64 cppwinrt)
 
-refresh_sources() { # $1 = build dir exposing the <pkg>-force-update targets
+refresh_sources() { # $1 = build dir with the <pkg>-force-update targets
     local dir=$1 pkg targets=() names=()
     for pkg in "${toolchain_pkgs[@]}"; do
         if [[ -d "$buildroot/src_packages/$pkg/.git" ]]; then
@@ -98,7 +98,7 @@ ninja -C "$base_dir" shaderc
 
 echo ">> [5/6] Merge profraw -> $profdata"
 profraw=("$clang_root"/profiles/*.profraw)
-[[ ${#profraw[@]} -gt 0 ]] || { echo "no profraw under $clang_root/profiles -- PGO training produced no profile" >&2; exit 1; }
+[[ ${#profraw[@]} -gt 0 ]] || { echo "No profraw under $clang_root/profiles -- PGO training produced no profile" >&2; exit 1; }
 llvm-profdata merge "${profraw[@]}" -o "$profdata"
 rm -rf "$clang_root"/profiles/* || true
 
