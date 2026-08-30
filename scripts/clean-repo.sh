@@ -1,6 +1,7 @@
 #!/bin/bash
 # Reset git-based package sources for a fresh re-clone. For each package, ninja
-# runs its <pkg>-fullclean and <pkg>-removeprefix.
+# runs its <pkg>-fullclean and <pkg>-removeprefix. mingw-w64 is skipped: it is a
+# source-only ExternalProject and has neither target.
 #
 # Usage: clean-repo.sh [-p pkg]... [buildroot]
 #   -p, --pkg pkg  package to clean (repeatable; default: every git source clone)
@@ -32,21 +33,33 @@ src_packages="$buildroot/src_packages"
 
 shopt -s nullglob
 
-toolchain_pkgs=" llvm mingw-w64 cppwinrt "
+# These build nothing and install nothing, so cleanup() is never called for them
+# and ninja has no <pkg>-fullclean or <pkg>-removeprefix to run.
+source_only_pkgs=(mingw-w64)
+
+is_source_only() {
+    local p
+    for p in "${source_only_pkgs[@]}"; do
+        [[ "$p" == "$1" ]] && return 0
+    done
+    return 1
+}
 
 if [[ ${#pkgs[@]} -eq 0 ]]; then
     for d in "$src_packages"/*/; do
-        [[ -d "$d.git" ]] && pkgs+=("$(basename "$d")")
+        pkg=$(basename "$d")
+        [[ -d "$d.git" ]] || continue
+        is_source_only "$pkg" && continue
+        pkgs+=("$pkg")
+    done
+else
+    for pkg in "${pkgs[@]}"; do
+        is_source_only "$pkg" || continue
+        echo "No clean target for $pkg: it is a source-only package" >&2
+        exit 1
     done
 fi
-
-filtered=()
-for pkg in "${pkgs[@]}"; do
-    [[ "$toolchain_pkgs" == *" $pkg "* ]] && continue
-    filtered+=("$pkg")
-done
-[[ ${#filtered[@]} -gt 0 ]] || { echo "Nothing to clean under $src_packages" >&2; exit 1; }
-pkgs=("${filtered[@]}")
+[[ ${#pkgs[@]} -gt 0 ]] || { echo "Nothing to clean under $src_packages" >&2; exit 1; }
 
 build_dirs=()
 for dir in "$buildroot"/build_x86_64*; do
