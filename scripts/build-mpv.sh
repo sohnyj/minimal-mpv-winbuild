@@ -1,9 +1,10 @@
 #!/bin/bash
-# Build and package mpv for a target arch.
+# Build and package mpv for a target CPU.
 # Requires the toolchain from build-llvm.sh. Packaged .7z artifacts are written to release/.
 #
-# Usage: build-mpv.sh [--march <arch>] [--mtune <cpu>] [buildroot]
-#   --march <arch>  LLVM target arch (default: x86-64-v3; e.g. znver3, x86-64)
+# Usage: build-mpv.sh [--march <cpu>] [--mtune <cpu>] [buildroot]
+#   --march <cpu>   target CPU for -march (default: x86-64-v3; e.g. znver3, x86-64).
+#                   The arch stays x86_64; this is a psABI level or a CPU name.
 #   --mtune <cpu>   -mtune for package builds via CLANG_FLAGS (default: none)
 #   buildroot       location of the clang_root/src_packages/build dirs
 #                   (default: the repository root)

@@ -1,9 +1,10 @@
 #!/bin/bash
-# Build the LLVM/Clang + Rust cross toolchain from scratch for a target arch.
+# Build the LLVM/Clang + Rust cross toolchain from scratch for a target CPU.
 # Installs to clang_root. Run before build-mpv.sh.
 #
-# Usage: build-llvm.sh [--march <arch>] [buildroot]
-#   --march <arch>  LLVM target arch (default: x86-64-v3; e.g. znver3, x86-64)
+# Usage: build-llvm.sh [--march <cpu>] [buildroot]
+#   --march <cpu>   target CPU for -march (default: x86-64-v3; e.g. znver3, x86-64).
+#                   The arch stays x86_64; this is a psABI level or a CPU name.
 #   buildroot       location of the clang_root/src_packages/build dirs
 #                   (default: the repository root)
 set -euo pipefail
@@ -83,12 +84,12 @@ echo ">> [2/6] Build x86_64 sysroot"
 ninja -C "$base_dir" llvm-clang
 
 if [[ -n "$x86_64_level" ]]; then
-    echo ">> [3/6] Build $march sysroot"
+    echo ">> [3/6] Build x86_64$x86_64_level sysroot"
     cmake "${cmake_args[@]}" -DLLVM_ARCH="$march" \
         -DMINGW_INSTALL_PREFIX="$march_dir/x86_64$x86_64_level-w64-mingw32" -B "$march_dir"
     ninja -C "$march_dir" llvm-clang
 else
-    echo ">> [3/6] skipped ($march is the base sysroot)"
+    echo ">> [3/6] skipped (x86_64 is the base sysroot)"
 fi
 
 echo ">> [4/6] Train PGO with shaderc"
@@ -96,13 +97,13 @@ cmake "${cmake_args[@]}" -DLLVM_ENABLE_PGO=GEN -DCLANG_PACKAGES_LTO=ON \
     -DMINGW_INSTALL_PREFIX="$base_dir/x86_64-w64-mingw32" -B "$base_dir"
 ninja -C "$base_dir" shaderc
 
-echo ">> [5/6] Merge profraw -> $profdata"
+echo ">> [5/6] Merge profraw to $profdata"
 profraw=("$clang_root"/profiles/*.profraw)
 [[ ${#profraw[@]} -gt 0 ]] || { echo "No profraw under $clang_root/profiles -- PGO training produced no profile" >&2; exit 1; }
 llvm-profdata merge "${profraw[@]}" -o "$profdata"
 rm -rf "$clang_root"/profiles/* || true
 
-echo ">> [6/6] Rebuild LLVM with PGO"
+echo ">> [6/6] Build LLVM with PGO"
 cmake "${cmake_args[@]}" -DLLVM_ENABLE_PGO=USE -DLLVM_PROFDATA_FILE="$profdata" \
     -DMINGW_INSTALL_PREFIX="$base_dir/x86_64-w64-mingw32" -B "$base_dir"
 ninja -C "$base_dir" llvm
