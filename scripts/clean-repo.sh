@@ -71,7 +71,7 @@ rc=0
 for pkg in "${pkgs[@]}"; do
     echo ">> Clean $pkg"
     for dir in "${build_dirs[@]}"; do
-        ninja -C "$dir" "$pkg-fullclean" || true
+        ninja -C "$dir" "$pkg-fullclean" || rc=1
         ninja -C "$dir" "$pkg-removeprefix" || rc=1
     done
 done
