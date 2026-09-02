@@ -238,7 +238,7 @@ jobs:
     env:
       ARCH: x86_64
       GH_TOKEN: ${{ github.token }}
-      CURL_RETRIES: "--connect-timeout 60 --retry 999 --retry-delay 5 --retry-all-errors"
+      CURL_RETRY_OPTIONS: "--connect-timeout 60 --retry 999 --retry-delay 5 --retry-all-errors"
       RELEASE_V3_KEY: release-x86_64-v3-${{ needs.build_mpv.outputs.cache_date }}-${{ github.run_id }}
       RELEASE_ZNVER3_KEY: release-x86_64-znver3-${{ needs.build_mpv.outputs.cache_date }}-${{ github.run_id }}
     steps:
@@ -286,7 +286,7 @@ jobs:
           **Workflow**: [$GITHUB_RUN_ID]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
           END
           )
-          id=$(curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES --fail-with-body -s -X POST -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/releases -d @- <<END | jq -r '.id'
+          id=$(curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRY_OPTIONS --fail-with-body -s -X POST -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/releases -d @- <<END | jq -r '.id'
           {
             "tag_name": "$tag",
             "name": "$name",
@@ -294,7 +294,7 @@ jobs:
           }
           END
           )
-          for file in release/*.7z; do curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES --fail-with-body -X POST -H "Accept: application/vnd.github.v3+json" -H "Content-Type: $(file -b --mime-type $file)" https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$id/assets?name=$(basename $file) --data-binary @$file; done
+          for file in release/*.7z; do curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRY_OPTIONS --fail-with-body -X POST -H "Accept: application/vnd.github.v3+json" -H "Content-Type: $(file -b --mime-type $file)" https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$id/assets?name=$(basename $file) --data-binary @$file; done
 
       - name: Prune tags
         continue-on-error: true
@@ -304,8 +304,8 @@ jobs:
           old=("${tag_list[@]:30}")
           [ ${#old[@]} -gt 0 ] || exit 0
           for tag in "${old[@]}"; do
-            id=$(curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES -s -X GET -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/$tag | jq -r '.id')
-            curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES -s -X DELETE -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$id
+            id=$(curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRY_OPTIONS -s -X GET -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/$tag | jq -r '.id')
+            curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRY_OPTIONS -s -X DELETE -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$id
           done
           git push origin --delete "${old[@]}"
 
@@ -313,5 +313,5 @@ jobs:
         if: ${{ github.event.inputs.github_release == 'false' || steps.upload_packages_gh.outcome == 'success' }}
         run: |
           for key in "$RELEASE_V3_KEY" "$RELEASE_ZNVER3_KEY"; do
-            curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES -s -o /dev/null -X DELETE -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/caches?key=$key"
+            curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRY_OPTIONS -s -o /dev/null -X DELETE -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/caches?key=$key"
           done

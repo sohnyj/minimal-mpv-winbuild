@@ -84,13 +84,13 @@ jobs:
           TOOLCHAIN_KEY: ${{ steps.toolchain_cache.outputs.cache-matched-key }}
           X86_64_SYSROOT_KEY: ${{ steps.x86_64_sysroot_cache.outputs.cache-matched-key }}
           X86_64_V3_SYSROOT_KEY: ${{ steps.x86_64-v3_sysroot_cache.outputs.cache-matched-key }}
-          FRESH: ${{ steps.cache_date.outputs.value }}-${{ github.run_id }}
+          NEW_TOOLCHAIN_ID: ${{ steps.cache_date.outputs.value }}-${{ github.run_id }}
         run: |
           if [ -n "$TOOLCHAIN_KEY" ] && [ -n "$X86_64_SYSROOT_KEY" ] && [ -n "$X86_64_V3_SYSROOT_KEY" ]; then
             echo "value=${TOOLCHAIN_KEY#x86_64_toolchain-}" >> $GITHUB_OUTPUT
             echo "rebuilt=false" >> $GITHUB_OUTPUT
           else
-            echo "value=$FRESH" >> $GITHUB_OUTPUT
+            echo "value=$NEW_TOOLCHAIN_ID" >> $GITHUB_OUTPUT
             echo "rebuilt=true" >> $GITHUB_OUTPUT
           fi
 
@@ -208,11 +208,11 @@ jobs:
     needs: build_llvm
     env:
       GH_TOKEN: ${{ github.token }}
-      CURL_RETRIES: "--connect-timeout 60 --retry 999 --retry-delay 5 --retry-all-errors"
+      CURL_RETRY_OPTIONS: "--connect-timeout 60 --retry 999 --retry-delay 5 --retry-all-errors"
     steps:
       - name: Dispatch build-mpv.yml
         run: |
-          curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRIES --fail-with-body -X POST -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/build-mpv.yml/dispatches -d @- <<EOF
+          curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRY_OPTIONS --fail-with-body -X POST -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/build-mpv.yml/dispatches -d @- <<EOF
           {
             "ref": "master",
             "inputs": {
