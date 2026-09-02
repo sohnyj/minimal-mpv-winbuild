@@ -206,7 +206,7 @@ jobs:
 
       - name: Save ${{ matrix.x86_64_level }} packages cache
         uses: actions/cache/save@main
-        if: ${{ always() && steps.build_mpv.conclusion != 'skipped' && (steps.sysroot_cache.outputs.cache-matched-key != '' || steps.packages_cache.outputs.cache-matched-key != '') }}
+        if: ${{ always() && steps.build_mpv.conclusion != 'skipped' }}
         with:
           path: |
             ${{ env.BUILD_DIR }}
