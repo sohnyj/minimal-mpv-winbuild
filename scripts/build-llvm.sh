@@ -59,7 +59,7 @@ cmake_args=(
 
 toolchain_pkgs=(llvm mingw-w64 cppwinrt)
 
-refresh_sources() { # $1 = build dir with the <pkg>-force-update targets
+force_update_toolchain_sources() { # $1 = build dir with the <pkg>-force-update targets
     local dir=$1 pkg targets=() names=()
     for pkg in "${toolchain_pkgs[@]}"; do
         if [[ -d "$buildroot/src_packages/$pkg/.git" ]]; then
@@ -67,7 +67,7 @@ refresh_sources() { # $1 = build dir with the <pkg>-force-update targets
         fi
     done
     if [[ ${#targets[@]} -gt 0 ]]; then
-        echo ">> Fast-forward toolchain sources: ${names[*]}"
+        echo ">> Force-update toolchain sources: ${names[*]}"
         ninja -C "$dir" "${targets[@]}"
     fi
 }
@@ -75,7 +75,7 @@ refresh_sources() { # $1 = build dir with the <pkg>-force-update targets
 echo ">> [1/6] Build LLVM with PGO instrumentation"
 cmake "${cmake_args[@]}" -DLLVM_ENABLE_PGO=GEN \
     -DMINGW_INSTALL_PREFIX="$base_dir/x86_64-w64-mingw32" -B "$base_dir"
-refresh_sources "$base_dir"
+force_update_toolchain_sources "$base_dir"
 ninja -C "$base_dir" llvm
 ninja -C "$base_dir" rustup
 ninja -C "$base_dir" cargo-clean
@@ -101,7 +101,7 @@ echo ">> [5/6] Merge profraw to $profdata"
 profraw=("$clang_root"/profiles/*.profraw)
 [[ ${#profraw[@]} -gt 0 ]] || { echo "No profraw under $clang_root/profiles -- PGO training produced no profile" >&2; exit 1; }
 llvm-profdata merge "${profraw[@]}" -o "$profdata"
-rm -rf "$clang_root"/profiles/* || true
+rm -rf "$clang_root"/profiles/*
 
 echo ">> [6/6] Build LLVM with PGO"
 cmake "${cmake_args[@]}" -DLLVM_ENABLE_PGO=USE -DLLVM_PROFDATA_FILE="$profdata" \
