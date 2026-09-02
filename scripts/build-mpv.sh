@@ -61,7 +61,7 @@ fi
 clang_flags=""
 if [[ -n "$mtune" ]]; then clang_flags="-mtune=$mtune"; fi
 
-echo ">> [1/6] Configure mpv ($march${mtune:+, -mtune=$mtune}) in $march_dir"
+echo ">> [1/7] Configure mpv ($march${mtune:+, -mtune=$mtune}) in $march_dir"
 cmake \
     -DTARGET_ARCH=x86_64-w64-mingw32 \
     -DCOMPILER_TOOLCHAIN=clang \
@@ -75,16 +75,16 @@ cmake \
     -DCLANG_FLAGS="$clang_flags" \
     -G Ninja --fresh -B "$march_dir" -S "$repo_root"
 
-echo ">> [2/6] Download sources"
+echo ">> [2/7] Download sources"
 ninja -C "$march_dir" download || true
 
-echo ">> [3/6] Update git packages"
+echo ">> [3/7] Update git packages"
 ninja -C "$march_dir" update
 
-echo ">> [4/6] Build mpv"
+echo ">> [4/7] Build mpv"
 ninja -C "$march_dir" mpv
 
-echo ">> [5/6] Package mpv"
+echo ">> [5/7] Package mpv"
 mkdir -p "$release_dir"
 ninja -C "$march_dir" mpv-packaging
 archives=("$march_dir"/mpv*.7z)
@@ -99,7 +99,12 @@ ffmpeg_archive="ffmpeg-x86_64$x86_64_level-git-$ffmpeg_hash.7z"
     "$sysroot/bin/ffmpeg.exe"
 produced+=("$ffmpeg_archive")
 
-echo ">> [6/6] Clean cargo cache"
+echo ">> [6/7] Clean mpv build state"
+mpv_packaging_outputs=("$march_dir"/mpv*)
+rm -rf "${mpv_packaging_outputs[@]}"
+ninja -C "$march_dir" mpv-fullclean
+
+echo ">> [7/7] Clean cargo cache"
 ninja -C "$march_dir" cargo-clean
 
 echo ">> Artifacts: $release_dir"
