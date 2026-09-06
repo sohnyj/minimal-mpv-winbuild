@@ -30,7 +30,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 [[ -n "$buildroot" ]] || buildroot="$repo_root"
-mkdir -p "$buildroot"
+[[ -d "$buildroot" ]] || { echo "No such directory: $buildroot" >&2; exit 1; }
 buildroot=$(cd "$buildroot" && pwd)
 
 # Derive x86_64_level exactly like CMakeLists.txt's x86_64_LEVEL
