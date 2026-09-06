@@ -25,7 +25,6 @@ jobs:
     name: Build mpv (${{ matrix.llvm_arch }})
     runs-on: ubuntu-latest
     outputs:
-      cache_date: ${{ steps.cache_date.outputs.value }}
       clang_version: ${{ steps.source_revisions.outputs.clang_version }}
       mpv_shorthead: ${{ steps.source_revisions.outputs.mpv }}
       ffmpeg_shorthead: ${{ steps.source_revisions.outputs.ffmpeg }}
@@ -66,10 +65,6 @@ jobs:
       - uses: actions/checkout@main
         with:
           ref: master
-
-      - name: Set cache date
-        id: cache_date
-        run: echo "value=$(date -u +'%Y%m%d')" >> $GITHUB_OUTPUT
 
       - name: Load x86_64 toolchain cache
         id: toolchain_cache
@@ -170,11 +165,11 @@ jobs:
           if-no-files-found: ignore
           retention-days: 1
 
-      - name: Upload ${{ matrix.x86_64_level }} build
+      - name: Upload ${{ matrix.x86_64_level }} release archives
         uses: actions/upload-artifact@master
         with:
-          name: mpv-${{ env.ARCH }}-${{ matrix.x86_64_level }}
-          path: release-${{ env.ARCH }}-${{ matrix.x86_64_level }}/mpv-${{ env.ARCH }}*
+          name: release-${{ env.ARCH }}-${{ matrix.x86_64_level }}
+          path: release-${{ env.ARCH }}-${{ matrix.x86_64_level }}
           if-no-files-found: error
           compression-level: 0
 
@@ -225,12 +220,6 @@ jobs:
             gh cache delete "$key" --repo "$REPO" || true
           done
 
-      - name: Save release cache
-        uses: actions/cache/save@main
-        with:
-          path: release-${{ env.ARCH }}-${{ matrix.x86_64_level }}
-          key: release-${{ env.ARCH }}-${{ matrix.x86_64_level }}-${{ steps.cache_date.outputs.value }}-${{ github.run_id }}
-
   release:
     name: Upload releases
     runs-on: ubuntu-latest
@@ -239,8 +228,6 @@ jobs:
       ARCH: x86_64
       GH_TOKEN: ${{ github.token }}
       CURL_RETRY_OPTIONS: "--connect-timeout 60 --retry 999 --retry-delay 5 --retry-all-errors"
-      RELEASE_V3_KEY: release-x86_64-v3-${{ needs.build_mpv.outputs.cache_date }}-${{ github.run_id }}
-      RELEASE_ZNVER3_KEY: release-x86_64-znver3-${{ needs.build_mpv.outputs.cache_date }}-${{ github.run_id }}
     steps:
       - name: Install dependencies
         run: |
@@ -253,23 +240,15 @@ jobs:
           ref: master
           fetch-tags: true
 
-      - name: Load x86_64-v3 release cache
-        uses: actions/cache/restore@main
+      - name: Download release archives
+        uses: actions/download-artifact@main
         with:
-          path: release-${{ env.ARCH }}-v3
-          key: ${{ env.RELEASE_V3_KEY }}
+          pattern: release-${{ env.ARCH }}-*
+          path: release
+          merge-multiple: true
 
-      - name: Load x86_64-znver3 release cache
-        uses: actions/cache/restore@main
-        with:
-          path: release-${{ env.ARCH }}-znver3
-          key: ${{ env.RELEASE_ZNVER3_KEY }}
-
-      - name: Move archives
-        run: |
-          mkdir -p release
-          mv release-${{ env.ARCH }}-*/* release || true
-          du -ah release/*
+      - name: List archives
+        run: du -ah release/*.7z
 
       - name: Upload packages to Github release
         id: upload_packages_gh
@@ -308,10 +287,3 @@ jobs:
             curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRY_OPTIONS -s -X DELETE -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$id
           done
           git push origin --delete "${old[@]}"
-
-      - name: Delete release caches
-        if: ${{ github.event.inputs.github_release == 'false' || steps.upload_packages_gh.outcome == 'success' }}
-        run: |
-          for key in "$RELEASE_V3_KEY" "$RELEASE_ZNVER3_KEY"; do
-            curl -H "Authorization: Bearer $GH_TOKEN" $CURL_RETRY_OPTIONS -s -o /dev/null -X DELETE -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/caches?key=$key"
-          done
