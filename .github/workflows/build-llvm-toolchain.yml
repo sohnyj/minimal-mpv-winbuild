@@ -50,7 +50,7 @@ jobs:
 
       - name: Load x86_64 toolchain cache
         id: toolchain_cache
-        if: ${{ github.event.inputs.fresh_build != 'true' }}
+        if: ${{ !inputs.fresh_build }}
         uses: actions/cache/restore@main
         with:
           path: clang_root
@@ -60,7 +60,7 @@ jobs:
 
       - name: Load x86_64 sysroot cache
         id: x86_64_sysroot_cache
-        if: ${{ github.event.inputs.fresh_build != 'true' }}
+        if: ${{ !inputs.fresh_build }}
         uses: actions/cache/restore@main
         with:
           path: build_x86_64
@@ -70,7 +70,7 @@ jobs:
 
       - name: Load x86_64-v3 sysroot cache
         id: x86_64-v3_sysroot_cache
-        if: ${{ github.event.inputs.fresh_build != 'true' }}
+        if: ${{ !inputs.fresh_build }}
         uses: actions/cache/restore@main
         with:
           path: build_x86_64-v3

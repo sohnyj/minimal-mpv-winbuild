@@ -252,7 +252,7 @@ jobs:
 
       - name: Upload packages to Github release
         id: upload_packages_gh
-        if: ${{ github.event.inputs.github_release == 'true' }}
+        if: ${{ inputs.github_release }}
         continue-on-error: true
         run: |
           tag=$(date "+%Y%m%d-%H%M%S")-$(git rev-parse --short HEAD)
