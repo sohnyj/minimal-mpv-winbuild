@@ -33,8 +33,14 @@ src_packages="$buildroot/src_packages"
 
 shopt -s nullglob
 
-# These build nothing and install nothing, so cleanup() is never called for them
-# and ninja has no <pkg>-fullclean or <pkg>-removeprefix to run.
+build_dirs=()
+for dir in "$buildroot"/build_x86_64*; do
+    [[ -f "$dir/build.ninja" ]] && build_dirs+=("$dir")
+done
+[[ ${#build_dirs[@]} -gt 0 ]] || { echo "No configured build_x86_64* dir under $buildroot" >&2; exit 1; }
+
+ninja_targets=$(ninja -C "${build_dirs[0]}" -t targets all) || exit 1
+
 source_only_pkgs=(mingw-w64)
 
 is_source_only() {
@@ -45,27 +51,34 @@ is_source_only() {
     return 1
 }
 
+has_clean_target() { # $1 = package
+    awk -F: -v target="$1-fullclean" '$1 == target { found = 1 } END { exit !found }' <<< "$ninja_targets"
+}
+
 if [[ ${#pkgs[@]} -eq 0 ]]; then
     for d in "$src_packages"/*/; do
         pkg=$(basename "$d")
         [[ -d "$d.git" ]] || continue
         is_source_only "$pkg" && continue
+        if ! has_clean_target "$pkg"; then
+            echo "Skip $pkg: not a package of this checkout" >&2
+            continue
+        fi
         pkgs+=("$pkg")
     done
 else
     for pkg in "${pkgs[@]}"; do
-        is_source_only "$pkg" || continue
-        echo "No clean target for $pkg: it is a source-only package" >&2
-        exit 1
+        if is_source_only "$pkg"; then
+            echo "No clean target for $pkg: it is a source-only package" >&2
+            exit 1
+        fi
+        if ! has_clean_target "$pkg"; then
+            echo "No clean target for $pkg: not a package of this checkout" >&2
+            exit 1
+        fi
     done
 fi
 [[ ${#pkgs[@]} -gt 0 ]] || { echo "Nothing to clean under $src_packages" >&2; exit 1; }
-
-build_dirs=()
-for dir in "$buildroot"/build_x86_64*; do
-    [[ -f "$dir/build.ninja" ]] && build_dirs+=("$dir")
-done
-[[ ${#build_dirs[@]} -gt 0 ]] || { echo "No configured build_x86_64* dir under $buildroot" >&2; exit 1; }
 
 rc=0
 for pkg in "${pkgs[@]}"; do
