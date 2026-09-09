@@ -18,7 +18,6 @@ ExternalProject_Add(libzimg
         --disable-shared
         --disable-testapp
         --disable-unit-test
-        CPPFLAGS='-D_LIBCPP_KEEP_TRANSITIVE_INCLUDES_LLVM23'
     BUILD_COMMAND ${MAKE}
     INSTALL_COMMAND ${MAKE} install
             COMMAND bash -c "git -C ${src_graphengine} clean -dfx"
