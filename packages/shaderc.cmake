@@ -9,7 +9,7 @@ ExternalProject_Add(shaderc
     GIT_TAG main
     GIT_CLONE_FLAGS "--filter=tree:0"
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${EXEC} LTO_JOB=1 CONF=1 cmake -H<SOURCE_DIR> -B<BINARY_DIR>
+    CONFIGURE_COMMAND ${EXEC} CONF=1 cmake -H<SOURCE_DIR> -B<BINARY_DIR>
         -G Ninja
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}
@@ -35,7 +35,7 @@ ExternalProject_Add(shaderc
         -DSPIRV_TOOLS_BUILD_STATIC=ON
         -DSPIRV_TOOLS_LIBRARY_TYPE=STATIC
         -DSPIRV_WERROR=OFF
-    BUILD_COMMAND ${EXEC} LTO_JOB=1 ninja -C <BINARY_DIR> libshaderc_combined.a shaderc_combined-pkg-config
+    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> libshaderc_combined.a shaderc_combined-pkg-config
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
