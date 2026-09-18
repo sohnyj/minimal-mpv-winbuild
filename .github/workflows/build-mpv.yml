@@ -276,6 +276,7 @@ jobs:
         continue-on-error: true
         run: |
           # Keep latest 30 tags/releases
+          git fetch --tags --force origin
           tag_list=($(git tag | sort -rV))
           old=("${tag_list[@]:30}")
           [ ${#old[@]} -gt 0 ] || exit 0
