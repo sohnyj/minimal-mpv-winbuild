@@ -2,7 +2,7 @@ ExternalProject_Add(libvpl
     GIT_REPOSITORY https://github.com/intel/libvpl.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--sparse --filter=tree:0"
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !/doc !/examples /examples/CMakeLists.txt"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !/api/tests !/doc !/examples !/libvpl/test /examples/CMakeLists.txt"
     GIT_REMOTE_NAME origin
     GIT_TAG main
     PATCH_COMMAND ${EXEC} git am --3way ${CMAKE_CURRENT_SOURCE_DIR}/libvpl-0001-guard-wcscpy_s-wcscat_s-macros.patch
