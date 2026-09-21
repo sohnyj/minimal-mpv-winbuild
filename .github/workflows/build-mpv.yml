@@ -12,10 +12,6 @@ on:
         default: true
         type: boolean
 
-permissions:
-  contents: write
-  actions: write
-
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
@@ -24,6 +20,9 @@ jobs:
   build_mpv:
     name: Build mpv (${{ matrix.llvm_arch }})
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
     outputs:
       clang_version: ${{ steps.source_revisions.outputs.clang_version }}
       mpv_shorthead: ${{ steps.source_revisions.outputs.mpv }}
@@ -226,6 +225,9 @@ jobs:
     name: Upload releases
     runs-on: ubuntu-latest
     needs: build_mpv
+    permissions:
+      contents: write
+      actions: read
     env:
       ARCH: x86_64
       GH_TOKEN: ${{ github.token }}
