@@ -40,6 +40,7 @@ ExternalProject_Add(openssl
         no-mdc2
         no-nextprotoneg
         no-ocsp
+        no-quic
         no-rc2
         no-rc4
         no-rfc3779
