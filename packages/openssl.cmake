@@ -18,8 +18,8 @@ ExternalProject_Add(openssl
         mingw64
         enable-brotli
         enable-ec_nistp_64_gcc_128
+        enable-threads
         enable-zstd
-        threads
         zlib
         no-autoload-config
         no-apps
@@ -34,9 +34,7 @@ ExternalProject_Add(openssl
         no-cms
         no-comp
         no-ct
-        no-demos
         no-dh
-        no-docs
         no-dsa
         no-dso
         no-ec2m
@@ -44,31 +42,23 @@ ExternalProject_Add(openssl
         no-filenames
         no-gost
         no-idea
-        no-ktls
         no-legacy
-        no-md2
         no-md4
         no-mdc2
-        no-module
         no-nextprotoneg
         no-ocsp
         no-rc2
         no-rc4
-        no-rc5
         no-rfc3779
         no-rmd160
         no-seed
         no-shared
         no-siphash
-        no-sm2
         no-sm3
         no-sm4
         no-srp
         no-ssl-trace
-        no-tests
-        no-trace
         no-ts
-        no-uplink
         no-whirlpool
     BUILD_COMMAND ${MAKE} build_sw
     INSTALL_COMMAND ${MAKE} install_sw
