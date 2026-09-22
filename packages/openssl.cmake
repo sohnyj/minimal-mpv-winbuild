@@ -17,6 +17,7 @@ ExternalProject_Add(openssl
         no-autoload-config
         no-apps
         no-aria
+        no-ascon128
         no-async
         no-bf
         no-blake2
@@ -30,30 +31,52 @@ ExternalProject_Add(openssl
         no-dh
         no-dsa
         no-dso
+        no-dtls1
         no-ec2m
         no-err
         no-filenames
         no-gost
+        no-hmac-drbg-kdf
+        no-http
         no-idea
+        no-ikev2kdf
+        no-integrity-only-ciphers
+        no-kbkdf
+        no-krb5kdf
         no-legacy
         no-md4
         no-mdc2
+        no-multiblock
         no-nextprotoneg
-        no-ocsp
+        no-ocb
+        no-psk
+        no-pvkkdf
         no-quic
         no-rc2
         no-rc4
         no-rfc3779
         no-rmd160
+        no-scrypt
         no-seed
         no-shared
         no-siphash
+        no-slh-dsa
         no-sm3
         no-sm4
+        no-snmpkdf
         no-srp
+        no-srtpkdf
+        no-sshkdf
+        no-sskdf
         no-ssl-trace
+        no-thread-pool
+        no-tls1_1
         no-ts
+        no-ui-console
         no-whirlpool
+        no-winstore
+        no-x942kdf
+        no-x963kdf
     BUILD_COMMAND ${MAKE} build_sw
     INSTALL_COMMAND ${MAKE} install_sw
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
