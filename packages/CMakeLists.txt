@@ -23,6 +23,7 @@ list(APPEND ep
     nghttp2
     nghttp3
     nvcodec-headers
+    openssl
     spirv-cross
     spirv-headers
     spirv-tools
@@ -39,16 +40,15 @@ list(APPEND ep
     libxml2
     libzimg
     luajit
-    openssl
+    ngtcp2
     shaderc
     vulkan
     # depth 2
+    curl
     freetype2
     libjxl
     libplacebo
-    ngtcp2
     # depth 3
-    curl
     harfbuzz
     libbluray
     # depth 4
