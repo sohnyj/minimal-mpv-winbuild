@@ -18,9 +18,9 @@ ExternalProject_Add(openssl
         mingw64
         enable-brotli
         enable-ec_nistp_64_gcc_128
+        enable-threads
+        enable-zlib
         enable-zstd
-        threads
-        zlib
         no-autoload-config
         no-apps
         no-aria
