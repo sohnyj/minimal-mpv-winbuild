@@ -2,6 +2,7 @@ ExternalProject_Add(ffmpeg
     DEPENDS
         amf-headers
         bzip2
+        curl
         dav1d
         freetype2
         fribidi
@@ -43,6 +44,7 @@ ExternalProject_Add(ffmpeg
         --enable-lcms2
         --enable-libass
         --enable-libbluray
+        --enable-libcurl
         --enable-libdav1d
         --enable-libfreetype
         --enable-libfribidi
@@ -69,7 +71,6 @@ ExternalProject_Add(ffmpeg
         --disable-ffprobe
         --disable-indev=gdigrab
         --disable-indev=vfwcap
-        --disable-libcurl
         --disable-outdevs
         --disable-sdl2
         --disable-vaapi
