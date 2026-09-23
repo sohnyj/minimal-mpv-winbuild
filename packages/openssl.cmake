@@ -32,7 +32,6 @@ ExternalProject_Add(openssl
         no-cmac
         no-cmp
         no-cms
-        no-comp
         no-ct
         no-demos
         no-dh
