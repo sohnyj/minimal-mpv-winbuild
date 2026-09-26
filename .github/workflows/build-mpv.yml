@@ -164,7 +164,6 @@ jobs:
           name: mpv-${{ env.ARCH }}-${{ matrix.x86_64_level }}-logs
           path: mpv-${{ env.ARCH }}-${{ matrix.x86_64_level }}-logs
           if-no-files-found: ignore
-          retention-days: 1
 
       - name: Upload ${{ matrix.x86_64_level }} release archives
         uses: actions/upload-artifact@master

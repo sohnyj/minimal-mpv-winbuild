@@ -155,7 +155,6 @@ jobs:
           name: toolchain-x86_64-logs
           path: toolchain-x86_64-logs
           if-no-files-found: ignore
-          retention-days: 1
 
       - name: Upload x86_64-v3 sysroot logs
         uses: actions/upload-artifact@master
@@ -164,7 +163,6 @@ jobs:
           name: sysroot-x86_64-v3-logs
           path: sysroot-x86_64-v3-logs
           if-no-files-found: ignore
-          retention-days: 1
 
       - name: Save x86_64 toolchain cache
         uses: actions/cache/save@main
