@@ -29,7 +29,7 @@ done
 mkdir -p "$buildroot"
 buildroot=$(cd "$buildroot" && pwd)
 
-# Derive x86_64_level exactly like CMakeLists.txt's x86_64_LEVEL
+# Suffix for the build and sysroot directories
 #   x86-64-vN -> -vN ,  <other> -> -<other> ,  x86-64 -> (empty)
 if [[ $march =~ ^x86-64(-.+)$ ]]; then
     x86_64_level="${BASH_REMATCH[1]}"

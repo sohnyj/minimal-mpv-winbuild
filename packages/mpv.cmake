@@ -71,39 +71,10 @@ ExternalProject_Add(mpv
         -Dzimg=enabled
         -Dzlib=enabled
     BUILD_COMMAND ${EXEC} LTO_JOB=1 ninja -C <BINARY_DIR>
-    INSTALL_COMMAND ""
+    INSTALL_COMMAND ${EXEC} meson install -C <BINARY_DIR> --no-rebuild --tags runtime
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
-)
-
-ExternalProject_Add_Step(mpv strip-binary
-    DEPENDEES build
-    COMMENT "Stripping mpv binaries"
-)
-
-ExternalProject_Add_Step(mpv copy-binary
-    DEPENDEES strip-binary
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.exe ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/mpv.exe
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.com ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/mpv.com
-    COMMENT "Copying mpv binaries"
-)
-
-set(RENAME ${CMAKE_CURRENT_BINARY_DIR}/mpv-prefix/src/rename.sh)
-file(WRITE ${RENAME}
-"#!/bin/bash
-cd $1
-GIT=$(git rev-parse --short=7 HEAD)
-mv $2 $2-git-\${GIT}")
-
-ExternalProject_Add_Step(mpv copy-package-dir
-    DEPENDEES copy-binary
-    COMMAND chmod 755 ${RENAME}
-    COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/mpv-package ${CMAKE_BINARY_DIR}/mpv-${TARGET_CPU}${x86_64_LEVEL}-${BUILDDATE}
-    COMMAND ${RENAME} <SOURCE_DIR> ${CMAKE_BINARY_DIR}/mpv-${TARGET_CPU}${x86_64_LEVEL}-${BUILDDATE}
-
-    COMMENT "Moving mpv package folder"
-    LOG 1
 )
 
 force_rebuild_git(mpv)
 force_meson_configure(mpv)
-cleanup(mpv copy-package-dir)
+cleanup(mpv install)

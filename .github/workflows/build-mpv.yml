@@ -123,30 +123,26 @@ jobs:
           ninja -C $BUILD_DIR update
           ninja -C $BUILD_DIR mpv
 
-      - name: Package mpv
-        run: |
-          shopt -s nullglob
-          mkdir -p release-${{ env.ARCH }}-${{ matrix.x86_64_level }}
-          ninja -C $BUILD_DIR mpv-packaging
-          archives=($BUILD_DIR/mpv*.7z)
-          [ ${#archives[@]} -gt 0 ] || { echo "mpv-packaging produced no archive in $BUILD_DIR" >&2; exit 1; }
-          mv "${archives[@]}" release-${{ env.ARCH }}-${{ matrix.x86_64_level }}/
-
       - name: Record source revisions
         id: source_revisions
         run: |
           clang_version=$(./clang_root/bin/clang -dumpversion)
-          mpv_hash=$(git -C src_packages/mpv rev-parse --short HEAD)
-          ffmpeg_hash=$(git -C src_packages/ffmpeg rev-parse --short HEAD)
-          libplacebo_hash=$(git -C src_packages/libplacebo rev-parse --short HEAD)
+          mpv_hash=$(git -C src_packages/mpv rev-parse --short=9 HEAD)
+          ffmpeg_hash=$(git -C src_packages/ffmpeg rev-parse --short=9 HEAD)
+          libplacebo_hash=$(git -C src_packages/libplacebo rev-parse --short=9 HEAD)
           echo "clang_version=$clang_version" >> $GITHUB_OUTPUT
           echo "mpv=$mpv_hash" >> $GITHUB_OUTPUT
           echo "ffmpeg=$ffmpeg_hash" >> $GITHUB_OUTPUT
           echo "libplacebo=$libplacebo_hash" >> $GITHUB_OUTPUT
 
-      - name: Copy ffmpeg
+      - name: Package mpv and ffmpeg
         run: |
-          7z a -m0=lzma2 -mx=9 -ms=on release-${{ env.ARCH }}-${{ matrix.x86_64_level }}/ffmpeg-$ARCH-${{ matrix.x86_64_level }}-git-${{ steps.source_revisions.outputs.ffmpeg }}.7z ./$BUILD_DIR/$ARCH-${{ env.SYSROOT_LEVEL }}-w64-mingw32/bin/ffmpeg.exe
+          release=release-${{ env.ARCH }}-${{ matrix.x86_64_level }}
+          bin=./$BUILD_DIR/$ARCH-${{ env.SYSROOT_LEVEL }}-w64-mingw32/bin
+          build_date=$(date -u +%Y%m%d)
+          mkdir -p $release
+          7z a -m0=lzma2 -mx=9 -ms=on $release/mpv-$ARCH-${{ matrix.x86_64_level }}-$build_date-git-${{ steps.source_revisions.outputs.mpv }}.7z $bin/mpv.exe $bin/mpv.com
+          7z a -m0=lzma2 -mx=9 -ms=on $release/ffmpeg-$ARCH-${{ matrix.x86_64_level }}-$build_date-git-${{ steps.source_revisions.outputs.ffmpeg }}.7z $bin/ffmpeg.exe
 
       - name: Collect logs
         if: always()
@@ -176,7 +172,6 @@ jobs:
       - name: Clean mpv build state
         if: ${{ always() && steps.build_mpv.conclusion != 'skipped' }}
         run: |
-          rm -rf $BUILD_DIR/mpv*
           ninja -C $BUILD_DIR mpv-fullclean
 
       - name: Clean cargo cache

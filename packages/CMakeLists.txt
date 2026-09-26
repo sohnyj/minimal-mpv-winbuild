@@ -58,7 +58,6 @@ list(APPEND ep
     ffmpeg
     # depth 6
     mpv
-    mpv-packaging
 )
 foreach(package IN LISTS ep)
     if(NOT ${SINGLE_SOURCE_LOCATION} STREQUAL "")

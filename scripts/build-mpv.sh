@@ -33,7 +33,7 @@ done
 [[ -d "$buildroot" ]] || { echo "No such directory: $buildroot" >&2; exit 1; }
 buildroot=$(cd "$buildroot" && pwd)
 
-# Derive x86_64_level exactly like CMakeLists.txt's x86_64_LEVEL
+# Suffix for the build and sysroot directories and the archive names
 #   x86-64-vN -> -vN ,  <other> -> -<other> ,  x86-64 -> (empty)
 if [[ $march =~ ^x86-64(-.+)$ ]]; then
     x86_64_level="${BASH_REMATCH[1]}"
@@ -84,24 +84,22 @@ ninja -C "$march_dir" update
 echo ">> [4/7] Build mpv"
 ninja -C "$march_dir" mpv
 
-echo ">> [5/7] Package mpv"
+echo ">> [5/7] Package mpv and ffmpeg"
 mkdir -p "$release_dir"
-ninja -C "$march_dir" mpv-packaging
-archives=("$march_dir"/mpv*.7z)
-[[ ${#archives[@]} -gt 0 ]] || { echo "No archive from mpv-packaging in $march_dir" >&2; exit 1; }
-mv "${archives[@]}" "$release_dir"/
-produced=("${archives[@]##*/}")
-
-ffmpeg_hash=$(git -C "$buildroot/src_packages/ffmpeg" rev-parse --short HEAD)
-ffmpeg_archive="ffmpeg-x86_64$x86_64_level-git-$ffmpeg_hash.7z"
+build_date=$(date -u +%Y%m%d)
+mpv_hash=$(git -C "$buildroot/src_packages/mpv" rev-parse --short=9 HEAD)
+ffmpeg_hash=$(git -C "$buildroot/src_packages/ffmpeg" rev-parse --short=9 HEAD)
+mpv_archive="mpv-x86_64$x86_64_level-$build_date-git-$mpv_hash.7z"
+ffmpeg_archive="ffmpeg-x86_64$x86_64_level-$build_date-git-$ffmpeg_hash.7z"
+7z a -m0=lzma2 -mx=9 -ms=on \
+    "$release_dir/$mpv_archive" \
+    "$sysroot/bin/mpv.exe" "$sysroot/bin/mpv.com"
 7z a -m0=lzma2 -mx=9 -ms=on \
     "$release_dir/$ffmpeg_archive" \
     "$sysroot/bin/ffmpeg.exe"
-produced+=("$ffmpeg_archive")
+produced=("$mpv_archive" "$ffmpeg_archive")
 
 echo ">> [6/7] Clean mpv build state"
-mpv_packaging_outputs=("$march_dir"/mpv*)
-rm -rf "${mpv_packaging_outputs[@]}"
 ninja -C "$march_dir" mpv-fullclean
 
 echo ">> [7/7] Clean cargo cache"
