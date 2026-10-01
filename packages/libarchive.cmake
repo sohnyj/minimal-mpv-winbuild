@@ -1,6 +1,7 @@
 ExternalProject_Add(libarchive
     DEPENDS
         bzip2
+        libiconv
         xz
         zlib
         zstd
