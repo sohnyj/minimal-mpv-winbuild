@@ -6,18 +6,23 @@ set(EXPORT
     TARGET_SYS=Windows
     BUILDMODE=static
     FILE_T=luajit.exe
-    INSTALL_DEP=src/luajit.exe
+    CFLAGS='-DUNICODE'
     XCFLAGS='-DLUAJIT_ENABLE_LUA52COMPAT'
     PREFIX=${MINGW_INSTALL_PREFIX} Q="
 )
 
-ExternalProject_Add(luajit
-    GIT_REPOSITORY https://github.com/LuaJIT/LuaJIT.git
+# luajit ships with a broken pkg-config file
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/luajit2.pc.in ${CMAKE_CURRENT_BINARY_DIR}/luajit2.pc @ONLY)
+
+ExternalProject_Add(luajit2
+    DEPENDS
+        libiconv
+    GIT_REPOSITORY https://github.com/openresty/luajit2.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !/doc"
+    GIT_CLONE_FLAGS "--filter=tree:0"
     GIT_REMOTE_NAME origin
-    GIT_TAG v2.1
+    GIT_TAG v2.1-agentzh
+    PATCH_COMMAND ${EXEC} git am --3way ${CMAKE_CURRENT_SOURCE_DIR}/luajit2-*.patch
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ${MAKE} -C <SOURCE_DIR>/src
@@ -32,11 +37,10 @@ ExternalProject_Add(luajit
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 
-# Strip Libs.private (-Wl,-E -lm -ldl), not needed for Windows
-ExternalProject_Add_Step(luajit strip-pc
+ExternalProject_Add_Step(luajit2 install-pc
     DEPENDEES install
-    COMMAND ${EXEC} sed -i [['/^Libs\.private/d']] ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/luajit.pc
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/luajit2.pc ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/luajit.pc
 )
 
-force_rebuild_git(luajit)
-cleanup(luajit strip-pc)
+force_rebuild_git(luajit2)
+cleanup(luajit2 install-pc)
