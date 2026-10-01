@@ -1,7 +1,8 @@
 ExternalProject_Add(cppwinrt
     GIT_REPOSITORY https://github.com/microsoft/cppwinrt.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--filter=tree:0"
+    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !/docs !/test"
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ${EXEC} CONF=1 PATH=$O_PATH cmake -H<SOURCE_DIR> -B<BINARY_DIR>
         -GNinja
