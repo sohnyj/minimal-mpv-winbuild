@@ -5,8 +5,6 @@ ExternalProject_Add(libjxl
         highway
         lcms2
         libjpeg
-        libpng
-        zlib
     GIT_REPOSITORY https://github.com/libjxl/libjxl.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--sparse --filter=tree:0"
