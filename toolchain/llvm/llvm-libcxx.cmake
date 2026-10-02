@@ -13,7 +13,6 @@ ExternalProject_Add(llvm-libcxx
         -DCMAKE_C_COMPILER=${TARGET_ARCH}-clang
         -DCMAKE_C_COMPILER_WORKS=1
         -DCMAKE_CXX_COMPILER=${TARGET_ARCH}-clang++
-        -DCMAKE_CXX_COMPILER_TARGET=${TARGET_CPU}-pc-windows-gnu
         -DCMAKE_CXX_COMPILER_WORKS=1
         -DCMAKE_RANLIB=${CMAKE_INSTALL_PREFIX}/bin/llvm-ranlib
         -DCMAKE_SYSTEM_NAME=Windows
