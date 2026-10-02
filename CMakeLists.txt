@@ -15,6 +15,7 @@ if(NOT CMAKE_GENERATOR STREQUAL "Ninja")
 endif()
 set(TARGET_ARCH "x86_64-w64-mingw32" CACHE STRING "The target architecture for this toolchain.")
 string(REGEX MATCH "^[^-]+" TARGET_CPU ${TARGET_ARCH})
+set(RUST_TARGET "${TARGET_CPU}-pc-windows-gnullvm")
 
 execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpmachine OUTPUT_VARIABLE HOST_ARCH)
 string(REGEX MATCH "^[^-]+" HOST_CPU ${HOST_ARCH})

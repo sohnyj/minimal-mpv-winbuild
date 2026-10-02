@@ -1,7 +1,7 @@
 [net]
 git-fetch-with-cli = true
 
-[target.@TARGET_CPU@-pc-windows-gnullvm]
+[target.@RUST_TARGET@]
 linker = "@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-clang++"
 ar = "@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-ar"
 rustflags = ["-Ctarget-cpu=@LLVM_ARCH@"]

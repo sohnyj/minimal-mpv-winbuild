@@ -1,9 +1,8 @@
-set(rust_target "gnullvm")
+string(MAKE_C_IDENTIFIER "${RUST_TARGET}" cargo_target)
+string(TOUPPER "${cargo_target}" cargo_target)
 if(CLANG_PACKAGES_LTO)
-    string(MAKE_C_IDENTIFIER "${TARGET_CPU}-pc-windows-${rust_target}" cargo_target)
-    string(TOUPPER "${cargo_target}" cargo_target)
     set(cargo_lto_rustflags "CARGO_PROFILE_RELEASE_LTO=thin
-                             CARGO_TARGET_${cargo_target}_RUSTFLAGS='-C linker-plugin-lto -C embed-bitcode -C lto=thin -C target-cpu=${LLVM_ARCH}'")
+                             CARGO_TARGET_${cargo_target}_RUSTFLAGS='-C linker-plugin-lto'")
     set(ffmpeg_lto "--enable-lto=thin")
     set(mpv_lto -Db_lto=true -Db_lto_mode=thin)
     if(NOT LLVM_ARCH_HAS_AVX)

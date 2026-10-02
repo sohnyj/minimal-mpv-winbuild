@@ -17,7 +17,7 @@ ExternalProject_Add(subrandr
         ${cargo_lto_rustflags}
         cargo xtask install
         --prefix ${MINGW_INSTALL_PREFIX}
-        --target ${TARGET_CPU}-pc-windows-${rust_target}
+        --target ${RUST_TARGET}
         --shared-library false
         --static-library true
     INSTALL_COMMAND ""
