@@ -1,5 +1,4 @@
 set(rust_target "gnullvm")
-set(ffmpeg_extra_libs "-lc++")
 set(mpv_lto_mode "-Db_lto_mode=thin")
 if(CLANG_PACKAGES_LTO)
     string(MAKE_C_IDENTIFIER "${TARGET_CPU}-pc-windows-${rust_target}" cargo_target)
