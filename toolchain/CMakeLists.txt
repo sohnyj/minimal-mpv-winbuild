@@ -9,7 +9,6 @@ list(APPEND ep
     rustup
     # depth 1
     gendef
-    llvm-compiler-rt
     mingw-w64-headers
     widl
     # depth 2
