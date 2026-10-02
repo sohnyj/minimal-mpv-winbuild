@@ -38,7 +38,7 @@ ExternalProject_Add(llvm-libcxx
         -DLIBUNWIND_ENABLE_STATIC=ON
         -DLIBUNWIND_INCLUDE_TESTS=FALSE
         -DLIBUNWIND_USE_COMPILER_RT=TRUE
-        -DLLVM_ENABLE_RUNTIMES='libunwind,libcxxabi,libcxx'
+        -DLLVM_ENABLE_RUNTIMES='libcxx,libcxxabi,libunwind'
     BUILD_COMMAND ${EXEC} LTO=0 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} LTO=0 ninja -C <BINARY_DIR> install
             COMMAND bash -c "cp ${MINGW_INSTALL_PREFIX}/lib/libc++.a ${MINGW_INSTALL_PREFIX}/lib/libstdc++.a"
