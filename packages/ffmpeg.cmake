@@ -58,6 +58,7 @@ ExternalProject_Add(ffmpeg
         --enable-libxml2
         --enable-libzimg
         --enable-lzma
+        --enable-mediafoundation
         --enable-nvdec
         --enable-nvenc
         --enable-openssl
