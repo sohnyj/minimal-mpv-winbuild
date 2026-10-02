@@ -7,6 +7,7 @@ ExternalProject_Add(libunibreak
         --host=${TARGET_ARCH}
         --prefix=${MINGW_INSTALL_PREFIX}
         --disable-shared
+        CPPFLAGS='-DNDEBUG'
     BUILD_COMMAND ${MAKE}
     INSTALL_COMMAND ${MAKE} install
     BUILD_IN_SOURCE 1
