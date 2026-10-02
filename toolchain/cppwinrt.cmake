@@ -1,4 +1,6 @@
 ExternalProject_Add(cppwinrt
+    DEPENDS
+        windows-rs
     GIT_REPOSITORY https://github.com/microsoft/cppwinrt.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--sparse --filter=tree:0"
@@ -11,8 +13,7 @@ ExternalProject_Add(cppwinrt
         -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
-            COMMAND ${EXEC} wget -O <BINARY_DIR>/Windows.winmd https://github.com/microsoft/windows-rs/raw/master/crates/libs/default/Windows.winmd
-            COMMAND ${EXEC} cppwinrt -input <BINARY_DIR>/Windows.winmd -output ${MINGW_INSTALL_PREFIX}/include/
+            COMMAND ${EXEC} cppwinrt -input ${WINDOWS_RS_SRC}/${windows_winmd} -output ${MINGW_INSTALL_PREFIX}/include/
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

@@ -57,7 +57,7 @@ cmake_args=(
     -S "$repo_root"
 )
 
-toolchain_pkgs=(llvm mingw-w64 cppwinrt)
+toolchain_pkgs=(llvm mingw-w64 cppwinrt windows-rs)
 
 force_update_toolchain_sources() { # $1 = build dir with the <pkg>-force-update targets
     local dir=$1 pkg targets=() names=()

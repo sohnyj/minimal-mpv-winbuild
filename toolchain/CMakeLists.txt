@@ -2,12 +2,13 @@ set_property(DIRECTORY PROPERTY EP_STEP_TARGETS download)
 include(${PROJECT_SOURCE_DIR}/cmake/toolchain_check.cmake)
 list(APPEND ep
     # depth 0
-    cppwinrt
     llvm
     ${llvm_wrapper}
     mingw-w64
     rustup
+    windows-rs
     # depth 1
+    cppwinrt
     gendef
     mingw-w64-headers
     widl
