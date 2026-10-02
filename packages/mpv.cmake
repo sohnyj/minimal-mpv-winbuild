@@ -65,6 +65,7 @@ ExternalProject_Add(mpv
         -Dtests=false
         -Duchardet=enabled
         -Dvapoursynth=disabled
+        -Dvector=enabled
         -Dvulkan=enabled
         -Dwasapi=enabled
         -Dwin32-smtc=enabled
