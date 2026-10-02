@@ -39,6 +39,7 @@ ExternalProject_Add(ffmpeg
         --enable-cross-compile
         --enable-cuda-llvm
         --enable-d3d11va
+        --enable-d3d12va
         --enable-ffnvcodec
         --enable-gpl
         --enable-iconv
